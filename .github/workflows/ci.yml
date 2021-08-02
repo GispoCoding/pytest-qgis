@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        docker_tags: [release-3_10, release-3_16, latest]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Pull QGIS ${{ matrix.docker_tags }}
+        run: docker pull qgis/qgis:${{ matrix.docker_tags }}
+    # Runs all tests
+      - name: Run tests
+        run: >
+          docker run --rm --net=host --volume `pwd`:/app -w=/app -e QGIS_PLUGIN_IN_CI=1 qgis/qgis:${{ matrix.docker_tags }} sh -c
+          "pip3 install -qr requirements.txt && pip3 install -e . && xvfb-run -s '+extension GLX -screen 0 1024x768x24'
+          pytest -v"
+
+  code-style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: pre-commit/action@v2.0.2
