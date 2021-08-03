@@ -7,8 +7,8 @@ from qgis.gui import QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.QtWidgets import QWidget
 
-from mock_qgis_classes import MainWindow, MockMessageBar
-from qgis_interface import QgisInterface
+from pytest_qgis.mock_qgis_classes import MainWindow, MockMessageBar
+from pytest_qgis.qgis_interface import QgisInterface
 
 
 @pytest.fixture(autouse=True, scope="session")

@@ -36,7 +36,7 @@ from qgis.core import (
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from mock_qgis_classes import MockMessageBar
+from pytest_qgis.mock_qgis_classes import MockMessageBar
 
 LOGGER = logging.getLogger("QGIS")
 
