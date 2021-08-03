@@ -7,19 +7,24 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 
-A pytest plugin for testing QGIS python plugins
-
+A [pytest](https://docs.pytest.org) plugin for testing QGIS python plugins.
 
 
 ## Features
 
+This plugin makes it easier to write QGIS plugin tests with the help of some fixtures:
 
-* TODO
+* `qgis_app` initializes and returns fully configured [`QgsApplication`](https://qgis.org/pyqgis/master/core/QgsApplication.html). This fixture is called
+    automatically on the start of pytest session.
+* `qgis_canvas` initializes and returns [`QgsMapCanvas`](https://qgis.org/pyqgis/master/gui/QgsMapCanvas.html)
+* `qgis_iface` returns mocked [`QgsInterface`](https://qgis.org/pyqgis/master/gui/QgisInterface.html)
+* `new_project` makes sure that all the map layers and configurations are removed. This should be used with tests that
+    add stuff to [`QgsProject`](https://qgis.org/pyqgis/master/core/QgsProject.html).
 
 
 ## Requirements
 
-* TODO
+This pytest plugin requires QGIS >= 3.10 to work.
 
 
 ## Installation
@@ -30,9 +35,6 @@ Install with `pip`:
 pip install pytest-qgis
 ```
 
-## Usage
-
-* TODO
 
 ## Contributing
 
@@ -40,4 +42,4 @@ Contributions are very welcome.
 
 ## License
 
-Distributed under the terms of the `GNU GPL v2.0`_ license, "pytest-qgis" is free and open source software
+Distributed under the terms of the `GNU GPL v2.0` license, "pytest-qgis" is free and open source software.
