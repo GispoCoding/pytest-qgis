@@ -19,13 +19,11 @@ def test_msg_bar(qgis_iface):
 def test_processing(qgis_processing):
     from qgis import processing
 
+    # Use any algo that is available on all test platforms
     result = processing.run(
-        "qgis:creategrid",
+        "qgis:regularpoints",
         {
-            "TYPE": 0,  # Point
-            "EXTENT": "0,2,0,2",
-            "HSPACING": 1.0,
-            "VSPACING": 1.0,
+            "EXTENT": "0,1,0,1",
             "CRS": "EPSG:4326",
             "OUTPUT": QgsProcessing.TEMPORARY_OUTPUT,
         },
