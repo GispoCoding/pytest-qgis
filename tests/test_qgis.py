@@ -16,7 +16,13 @@ def test_msg_bar(qgis_iface):
     assert qgis_iface.messageBar().messages.get(Qgis.Info) == ["title:text"]
 
 
-def test_processing(qgis_processing):
+def test_processing_providers(qgis_app, qgis_processing):
+    assert "qgis" in [
+        provider.id() for provider in qgis_app.processingRegistry().providers()
+    ]
+
+
+def test_processing_run(qgis_processing):
     from qgis import processing
 
     # Use any algo that is available on all test platforms
