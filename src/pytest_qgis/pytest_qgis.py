@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
+from typing import TYPE_CHECKING
+from unittest.mock import patch
+
 import pytest
 from qgis.core import QgsApplication
 from qgis.gui import QgisInterface as QgisInterfaceOrig
@@ -10,14 +14,27 @@ from qgis.PyQt.QtWidgets import QWidget
 from pytest_qgis.mock_qgis_classes import MainWindow, MockMessageBar
 from pytest_qgis.qgis_interface import QgisInterface
 
+if TYPE_CHECKING:
+    from _pytest.tmpdir import TempPathFactory
+
+
+@pytest.fixture(scope="session")
+def tmp_qgis_config_path(tmp_path_factory: "TempPathFactory") -> Path:
+    config_path = tmp_path_factory.mktemp("qgis-test")
+    with patch.dict("os.environ", {"QGIS_CUSTOM_CONFIG_PATH": str(config_path)}):
+        yield config_path
+
 
 @pytest.fixture(autouse=True, scope="session")
-def qgis_app() -> QgsApplication:
+def qgis_app(tmp_qgis_config_path: "Path") -> QgsApplication:
     """Initializes qgis session for all tests"""
-    gui_flag = False
-    app = QgsApplication([], gui_flag)
+
+    app = QgsApplication([], GUIenabled=False)
     app.initQgis()
-    return app
+
+    yield app
+
+    app.exitQgis()
 
 
 @pytest.fixture(scope="session")
