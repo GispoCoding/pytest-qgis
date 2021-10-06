@@ -1,4 +1,4 @@
-from qgis.core import Qgis, QgsProject, QgsVectorLayer
+from qgis.core import Qgis, QgsProcessing, QgsProject, QgsVectorLayer
 
 
 def test_add_layer():
@@ -27,7 +27,7 @@ def test_processing(qgis_processing):
             "HSPACING": 1.0,
             "VSPACING": 1.0,
             "CRS": "EPSG:4326",
-            "OUTPUT": "memory:",
+            "OUTPUT": QgsProcessing.TEMPORARY_OUTPUT,
         },
     )
 
