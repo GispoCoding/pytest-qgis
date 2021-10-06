@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os.path
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import patch
@@ -62,3 +64,16 @@ def new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
     Initializes new QGIS project by removing layers and relations etc.
     """
     qgis_iface.newProject()
+
+
+@pytest.fixture(scope="session")
+def qgis_processing(qgis_app: QgsApplication) -> None:
+    """
+    Initializes QGIS processing framework
+    """
+    python_plugins_path = os.path.join(qgis_app.pkgDataPath(), "python", "plugins")
+    if python_plugins_path not in sys.path:
+        sys.path.append(python_plugins_path)
+    from processing.core.Processing import Processing
+
+    Processing.initialize()
