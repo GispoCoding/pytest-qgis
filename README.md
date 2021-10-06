@@ -20,6 +20,7 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
 * `qgis_iface` returns mocked [`QgsInterface`](https://qgis.org/pyqgis/master/gui/QgisInterface.html)
 * `new_project` makes sure that all the map layers and configurations are removed. This should be used with tests that
     add stuff to [`QgsProject`](https://qgis.org/pyqgis/master/core/QgsProject.html).
+* `qgis_processing` initializes the processing framework. This can be used when testing code that calls `processing.run(...)`.
 
 
 ## Requirements
