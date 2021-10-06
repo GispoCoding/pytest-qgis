@@ -20,7 +20,7 @@ def test_processing(qgis_processing):
     from qgis import processing
 
     result = processing.run(
-        "native:creategrid",
+        "qgis:creategrid",
         {
             "TYPE": 0,  # Point
             "EXTENT": "0,2,0,2",
