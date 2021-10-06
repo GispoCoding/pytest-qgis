@@ -14,10 +14,13 @@ from pytest_qgis.qgis_interface import QgisInterface
 @pytest.fixture(autouse=True, scope="session")
 def qgis_app() -> QgsApplication:
     """Initializes qgis session for all tests"""
-    gui_flag = False
-    app = QgsApplication([], gui_flag)
+
+    app = QgsApplication([], GUIenabled=False)
     app.initQgis()
-    return app
+
+    yield app
+
+    app.exitQgis()
 
 
 @pytest.fixture(scope="session")
