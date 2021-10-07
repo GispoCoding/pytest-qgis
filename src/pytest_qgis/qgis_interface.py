@@ -12,6 +12,7 @@
      Copyright (c) 2010 by Ivan Mincik, ivan.mincik@gista.sk
      Copyright (c) 2011 German Carrillo, geotux_tuxman@linuxmail.org
      Copyright (c) 2014 Tim Sutton, tim@linfiniti.com
+     Copyright (c) 2021 pytest-qgis Contributors
 
 """
 
@@ -22,7 +23,7 @@ __copyright__ = (
     "Copyright (c) 2010 by Ivan Mincik, ivan.mincik@gista.sk and "
     "Copyright (c) 2011 German Carrillo, geotux_tuxman@linuxmail.org"
     "Copyright (c) 2014 Tim Sutton, tim@linfiniti.com"
-    "Copyright (c) 2021 Joona Laine, joona@gispo.fi"
+    "Copyright (c) 2021 pytest-qgis Contributors"
 )
 
 import logging

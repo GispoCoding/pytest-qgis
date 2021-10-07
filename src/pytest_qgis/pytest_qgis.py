@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#  Gispo Ltd., hereby disclaims all copyright interest in the program pytest-qgis
-#  Copyright (C) 2021 Gispo Ltd (https://www.gispo.fi/).
+#  Copyright (C) 2021 pytest-qgis Contributors.
 #
 #
 #  This file is part of pytest-qgis.
@@ -18,7 +17,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
-#
+
 
 import os.path
 import sys
