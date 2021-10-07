@@ -1,5 +1,5 @@
 # coding=utf-8
-# flake8: noqa N802
+
 """QGIS plugin implementation.
 
 .. note:: This program is free software; you can redistribute it and/or modify
@@ -22,9 +22,11 @@ __copyright__ = (
     "Copyright (c) 2010 by Ivan Mincik, ivan.mincik@gista.sk and "
     "Copyright (c) 2011 German Carrillo, geotux_tuxman@linuxmail.org"
     "Copyright (c) 2014 Tim Sutton, tim@linfiniti.com"
+    "Copyright (c) 2021 Joona Laine, joona@gispo.fi"
 )
 
 import logging
+from typing import List
 
 from qgis.core import (
     QgsLayerTree,
@@ -35,6 +37,7 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
+from qgis.PyQt.QtWidgets import QAction, QDockWidget, QWidget
 
 from pytest_qgis.mock_qgis_classes import MockMessageBar
 
@@ -51,13 +54,15 @@ class QgisInterface(QObject):
 
     currentLayerChanged = pyqtSignal(QgsMapCanvas)  # noqa N802
 
-    def __init__(self, canvas, messageBar, mainWindow):
+    def __init__(
+        self, canvas: QgsMapCanvas, messageBar: MockMessageBar, mainWindow: QWidget
+    ) -> None:
         """Constructor
         :param canvas:
         """
         QObject.__init__(self)
         self.canvas = canvas
-        self._messageBar: MockMessageBar = messageBar
+        self._messageBar = messageBar
         self._mainWindow = mainWindow
 
         # Set up slots so we can mimic the behaviour of QGIS when layers
@@ -70,10 +75,10 @@ class QgisInterface(QObject):
 
         # For processing module
         self.destCrs = None
-        self._layers = []
+        self._layers: List[QgsMapLayer] = []
 
     @pyqtSlot("QList<QgsMapLayer*>")
-    def addLayers(self, layers):
+    def addLayers(self, layers: List[QgsMapLayer]) -> None:
         """Handle layers being added to the registry so they show up in canvas.
 
         :param layers: list<QgsMapLayer> list of map layers that were added
@@ -96,12 +101,12 @@ class QgisInterface(QObject):
         # LOGGER.debug('Layer Count After: %s' % len(self.canvas.layers()))
 
     @pyqtSlot()
-    def removeAllLayers(self):
+    def removeAllLayers(self) -> None:
         """Remove layers from the canvas before they get deleted."""
         self.canvas.setLayers([])
         self._layers = []
 
-    def newProject(self):
+    def newProject(self) -> None:
         """Create new project."""
         # noinspection PyArgumentList
         instance = QgsProject.instance()
@@ -115,23 +120,25 @@ class QgisInterface(QObject):
 
     # ---------------- API Mock for QgsInterface follows -------------------
 
-    def zoomFull(self):
+    def zoomFull(self) -> None:
         """Zoom to the map full extent."""
         pass
 
-    def zoomToPrevious(self):
+    def zoomToPrevious(self) -> None:
         """Zoom to previous view extent."""
         pass
 
-    def zoomToNext(self):
+    def zoomToNext(self) -> None:
         """Zoom to next view extent."""
         pass
 
-    def zoomToActiveLayer(self):
+    def zoomToActiveLayer(self) -> None:
         """Zoom to extent of active layer."""
         pass
 
-    def addVectorLayer(self, path, base_name, provider_key):
+    def addVectorLayer(
+        self, path: str, base_name: str, provider_key: str
+    ) -> QgsVectorLayer:
         """Add a vector layer.
 
         :param path: Path to layer.
@@ -145,10 +152,9 @@ class QgisInterface(QObject):
         """
         layer = QgsVectorLayer(path, base_name, provider_key)
         self.addLayers([layer])
-        layers = self.canvas.layers()
         return layer
 
-    def addRasterLayer(self, path, base_name):
+    def addRasterLayer(self, path: str, base_name: str) -> None:
         """Add a raster layer given a raster layer file name
 
         :param path: Path to layer.
@@ -159,14 +165,14 @@ class QgisInterface(QObject):
         """
         pass
 
-    def activeLayer(self):
+    def activeLayer(self) -> QgsMapLayer:
         """Get pointer to the active layer (layer selected in the legend)."""
         # noinspection PyArgumentList
         layers = QgsProject.instance().mapLayers()
         for item in layers:
             return layers[item]
 
-    def addPluginToMenu(self, name, action):
+    def addPluginToMenu(self, name: str, action: QAction) -> None:
         """Add plugin item to menu.
 
         :param name: Name of the menu item
@@ -177,7 +183,7 @@ class QgisInterface(QObject):
         """
         pass
 
-    def addToolBarIcon(self, action):
+    def addToolBarIcon(self, action: QAction) -> None:
         """Add an icon to the plugins toolbar.
 
         :param action: Action to add to the toolbar.
@@ -185,7 +191,7 @@ class QgisInterface(QObject):
         """
         pass
 
-    def removeToolBarIcon(self, action):
+    def removeToolBarIcon(self, action: QAction) -> None:
         """Remove an action (icon) from the plugin toolbar.
 
         :param action: Action to add to the toolbar.
@@ -193,7 +199,7 @@ class QgisInterface(QObject):
         """
         pass
 
-    def addToolBar(self, name):
+    def addToolBar(self, name: str) -> None:
         """Add toolbar with specified name.
 
         :param name: Name for the toolbar.
@@ -201,29 +207,31 @@ class QgisInterface(QObject):
         """
         pass
 
-    def mapCanvas(self):
+    def mapCanvas(self) -> QgsMapCanvas:
         """Return a pointer to the map canvas."""
         return self.canvas
 
-    def mainWindow(self):
+    def mainWindow(self) -> QWidget:
         """Return a pointer to the main window.
 
         In case of QGIS it returns an instance of QgisApp.
         """
         return self._mainWindow
 
-    def addDockWidget(self, area, dock_widget):
+    def addDockWidget(
+        self, area: int, dock_widget: QDockWidget
+    ) -> None:  # noqa: ANN001
         """Add a dock widget to the main window.
 
         :param area: Where in the ui the dock should be placed.
-        :type area:
+        :type area: Qt.DockWidgetArea
 
         :param dock_widget: A dock widget to add to the UI.
         :type dock_widget: QDockWidget
         """
         pass
 
-    def legendInterface(self):
+    def legendInterface(self) -> QgsMapCanvas:
         """Get the legend."""
         return self.canvas
 
@@ -231,10 +239,10 @@ class QgisInterface(QObject):
         """Get the messagebar"""
         return self._messageBar
 
-    def getMockLayers(self):
+    def getMockLayers(self) -> List[QgsMapLayer]:
         return self._layers
 
-    def setActiveLayer(self, layer: QgsMapLayer):
+    def setActiveLayer(self, layer: QgsMapLayer) -> None:
         """
         Set the active layer (layer gets selected in the legend)
         """
