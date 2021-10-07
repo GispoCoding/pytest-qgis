@@ -58,7 +58,7 @@ def qgis_iface(qgis_canvas: QgsMapCanvas) -> QgisInterfaceOrig:
     return iface
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
     """
     Initializes new QGIS project by removing layers and relations etc.

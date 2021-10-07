@@ -8,7 +8,7 @@ def test_add_layer():
 
 
 def test_new_project(new_project):
-    QgsProject.instance().mapLayers() == {}
+    assert QgsProject.instance().mapLayers() == {}
 
 
 def test_msg_bar(qgis_iface):
