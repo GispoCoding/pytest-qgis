@@ -29,6 +29,7 @@ __copyright__ = (
 import logging
 from typing import List
 
+import sip
 from qgis.core import (
     QgsLayerTree,
     QgsMapLayer,
@@ -104,7 +105,8 @@ class QgisInterface(QObject):
     @pyqtSlot()
     def removeAllLayers(self) -> None:
         """Remove layers from the canvas before they get deleted."""
-        self.canvas.setLayers([])
+        if not sip.isdeleted(self.canvas):
+            self.canvas.setLayers([])
         self._layers = []
 
     def newProject(self) -> None:

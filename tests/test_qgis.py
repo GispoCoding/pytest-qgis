@@ -16,8 +16,28 @@
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 
-
+import pytest
 from qgis.core import Qgis, QgsProcessing, QgsProject, QgsVectorLayer
+
+# DO not use this directly, this is only meant to be used with
+# replace_iface_with_qgis_iface fixtrure
+__iface = None
+
+
+@pytest.fixture()
+def replace_iface_with_qgis_iface(qgis_iface):
+    global __iface
+    __iface = qgis_iface
+
+
+@pytest.mark.usefixtures("replace_iface_with_qgis_iface")
+def test_a_teardown():
+    """
+    When replacing importer or passed QgisInterface inside a fixture,
+    it might cause problems with pytest_qgis.qgis_interface.removeAllLayers
+    when qgis_app is exiting.
+    """
+    pass
 
 
 def test_add_layer():
