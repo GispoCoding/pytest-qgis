@@ -29,8 +29,8 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
 ### Hooks
 
 * `pytest_configure` hook is used to initialize and
-  configure [`QgsApplication`](https://qgis.org/pyqgis/master/core/QgsApplication.html) as well as to
-  patch `qgis.utils.iface` with `qgis_iface`.
+  configure [`QgsApplication`](https://qgis.org/pyqgis/master/core/QgsApplication.html). With QGIS >= 3.18 it is also
+  used to patch `qgis.utils.iface` with `qgis_iface` automatically.
 
 ## Requirements
 

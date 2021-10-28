@@ -25,18 +25,22 @@ from typing import TYPE_CHECKING, Optional
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from qgis.core import QgsApplication
+from qgis.core import Qgis, QgsApplication
 from qgis.gui import QgisInterface as QgisInterfaceOrig
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.QtWidgets import QWidget
-from qgis.utils import iface  # noqa # This import is required
 
 from pytest_qgis.mock_qgis_classes import MainWindow, MockMessageBar
 from pytest_qgis.qgis_interface import QgisInterface
 
 if TYPE_CHECKING:
     from _pytest.config import Config
+
+try:
+    QGIS_VERSION = Qgis.versionInt()
+except AttributeError:
+    QGIS_VERSION = Qgis.QGIS_VERSION_INT
 
 _APP: Optional[QgsApplication] = None
 _CANVAS: Optional[QgsMapCanvas] = None
@@ -92,7 +96,7 @@ def pytest_configure(config: "Config") -> None:
     global _APP, _CANVAS, _IFACE, _PARENT
 
     # Use temporary path for QGIS config
-    tmp_path_factory = TempPathFactory.from_config(config)
+    tmp_path_factory = TempPathFactory.from_config(config, _ispytest=True)
     config_path = tmp_path_factory.mktemp("qgis-test")
     os.environ["QGIS_CUSTOM_CONFIG_PATH"] = str(config_path)
 
@@ -107,5 +111,11 @@ def pytest_configure(config: "Config") -> None:
     # QgisInterface is a stub implementation of the QGIS plugin interface
     _IFACE = QgisInterface(_CANVAS, MockMessageBar(), MainWindow())
 
-    # Patching imported iface (evaluated as None in tests) with iface
-    sys.modules["qgis"].utils.iface = _IFACE  # type: ignore
+    # Patching imported iface (evaluated as None in tests) with iface.
+    # This only works with QGIS >= 3.18 since before that
+    # importing qgis.utils causes RecursionErrors. See this issue for details
+    # https://github.com/qgis/QGIS/issues/40564
+    if QGIS_VERSION >= 31800:
+        from qgis.utils import iface  # noqa # This import is required
+
+        sys.modules["qgis"].utils.iface = _IFACE  # type: ignore
