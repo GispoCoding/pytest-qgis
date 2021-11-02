@@ -31,7 +31,7 @@ from qgis.gui import QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.QtWidgets import QWidget
 
-from pytest_qgis.mock_qgis_classes import MainWindow, MockMessageBar
+from pytest_qgis.mock_qgis_classes import MockMessageBar
 from pytest_qgis.qgis_interface import QgisInterface
 
 if TYPE_CHECKING:
@@ -109,7 +109,7 @@ def pytest_configure(config: "Config") -> None:
     _CANVAS.resize(QtCore.QSize(400, 400))
 
     # QgisInterface is a stub implementation of the QGIS plugin interface
-    _IFACE = QgisInterface(_CANVAS, MockMessageBar(), MainWindow())
+    _IFACE = QgisInterface(_CANVAS, MockMessageBar(), _PARENT)
 
     # Patching imported iface (evaluated as None in tests) with iface.
     # This only works with QGIS >= 3.18 since before that

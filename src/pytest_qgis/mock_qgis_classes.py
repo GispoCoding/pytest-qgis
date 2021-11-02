@@ -17,7 +17,7 @@
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from qgis.core import Qgis
 from qgis.PyQt.QtCore import QObject
@@ -45,9 +45,3 @@ class MockMessageBar(QObject):
         """A mocked method for pushing a message to the bar."""
         msg = f"{title}:{text}"
         self.messages[level].append(msg)
-
-
-class MainWindow(QObject):
-    def blockSignals(self, *args: Any) -> None:  # noqa N802
-        """Mocked blockSignals"""
-        pass
