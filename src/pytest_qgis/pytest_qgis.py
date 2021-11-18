@@ -22,6 +22,7 @@
 import os.path
 import sys
 from typing import TYPE_CHECKING, Optional
+from unittest import mock
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
@@ -118,4 +119,4 @@ def pytest_configure(config: "Config") -> None:
     if QGIS_VERSION >= 31800:
         from qgis.utils import iface  # noqa # This import is required
 
-        sys.modules["qgis"].utils.iface = _IFACE  # type: ignore
+        mock.patch("qgis.utils.iface", _IFACE).start()
