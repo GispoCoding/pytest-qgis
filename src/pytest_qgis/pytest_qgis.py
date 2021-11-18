@@ -21,60 +21,54 @@
 
 import os.path
 import sys
-from pathlib import Path
-from typing import TYPE_CHECKING
-from unittest.mock import patch
+from typing import TYPE_CHECKING, Optional
+from unittest import mock
 
 import pytest
-from qgis.core import QgsApplication
+from _pytest.tmpdir import TempPathFactory
+from qgis.core import Qgis, QgsApplication
 from qgis.gui import QgisInterface as QgisInterfaceOrig
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.QtWidgets import QWidget
 
-from pytest_qgis.mock_qgis_classes import MainWindow, MockMessageBar
+from pytest_qgis.mock_qgis_classes import MockMessageBar
 from pytest_qgis.qgis_interface import QgisInterface
 
 if TYPE_CHECKING:
-    from _pytest.tmpdir import TempPathFactory
+    from _pytest.config import Config
 
+try:
+    QGIS_VERSION = Qgis.versionInt()
+except AttributeError:
+    QGIS_VERSION = Qgis.QGIS_VERSION_INT
 
-@pytest.fixture(scope="session")
-def tmp_qgis_config_path(tmp_path_factory: "TempPathFactory") -> Path:
-    config_path = tmp_path_factory.mktemp("qgis-test")
-    with patch.dict("os.environ", {"QGIS_CUSTOM_CONFIG_PATH": str(config_path)}):
-        yield config_path
+_APP: Optional[QgsApplication] = None
+_CANVAS: Optional[QgsMapCanvas] = None
+_IFACE: Optional[QgisInterface] = None
+_PARENT: Optional[QtWidgets.QWidget] = None
 
 
 @pytest.fixture(autouse=True, scope="session")
-def qgis_app(tmp_qgis_config_path: "Path") -> QgsApplication:
-    """Initializes qgis session for all tests"""
-
-    app = QgsApplication([], GUIenabled=False)
-    app.initQgis()
-
-    yield app
-
-    app.exitQgis()
+def qgis_app() -> QgsApplication:
+    yield _APP
+    assert _APP
+    _APP.exitQgis()
 
 
 @pytest.fixture(scope="session")
 def qgis_parent(qgis_app: QgsApplication) -> QWidget:
-    return QtWidgets.QWidget()
+    return _PARENT
 
 
 @pytest.fixture(scope="session")
-def qgis_canvas(qgis_parent: QWidget) -> QgsMapCanvas:
-    canvas = QgsMapCanvas(qgis_parent)
-    canvas.resize(QtCore.QSize(400, 400))
-    return canvas
+def qgis_canvas() -> QgsMapCanvas:
+    return _CANVAS
 
 
 @pytest.fixture(scope="session")
-def qgis_iface(qgis_canvas: QgsMapCanvas) -> QgisInterfaceOrig:
-    # QgisInterface is a stub implementation of the QGIS plugin interface
-    iface = QgisInterface(qgis_canvas, MockMessageBar(), MainWindow())
-    return iface
+def qgis_iface() -> QgisInterfaceOrig:
+    return _IFACE
 
 
 @pytest.fixture()
@@ -96,3 +90,33 @@ def qgis_processing(qgis_app: QgsApplication) -> None:
     from processing.core.Processing import Processing
 
     Processing.initialize()
+
+
+def pytest_configure(config: "Config") -> None:
+    """Initializes qgis session for all tests"""
+    global _APP, _CANVAS, _IFACE, _PARENT
+
+    # Use temporary path for QGIS config
+    tmp_path_factory = TempPathFactory.from_config(config, _ispytest=True)
+    config_path = tmp_path_factory.mktemp("qgis-test")
+    os.environ["QGIS_CUSTOM_CONFIG_PATH"] = str(config_path)
+
+    _APP = QgsApplication([], GUIenabled=False)
+    _APP.initQgis()
+
+    _PARENT = QtWidgets.QWidget()
+    _CANVAS = QgsMapCanvas(_PARENT)
+
+    _CANVAS.resize(QtCore.QSize(400, 400))
+
+    # QgisInterface is a stub implementation of the QGIS plugin interface
+    _IFACE = QgisInterface(_CANVAS, MockMessageBar(), _PARENT)
+
+    # Patching imported iface (evaluated as None in tests) with iface.
+    # This only works with QGIS >= 3.18 since before that
+    # importing qgis.utils causes RecursionErrors. See this issue for details
+    # https://github.com/qgis/QGIS/issues/40564
+    if QGIS_VERSION >= 31800:
+        from qgis.utils import iface  # noqa # This import is required
+
+        mock.patch("qgis.utils.iface", _IFACE).start()

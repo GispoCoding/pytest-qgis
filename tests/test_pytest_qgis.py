@@ -18,6 +18,12 @@
 
 import pytest
 from qgis.core import Qgis, QgsProcessing, QgsProject, QgsVectorLayer
+from qgis.utils import iface
+
+try:
+    QGIS_VERSION = Qgis.versionInt()
+except AttributeError:
+    QGIS_VERSION = Qgis.QGIS_VERSION_INT
 
 # DO not use this directly, this is only meant to be used with
 # replace_iface_with_qgis_iface fixtrure
@@ -78,3 +84,10 @@ def test_processing_run(qgis_processing):
     assert isinstance(result["OUTPUT"], QgsVectorLayer)
     assert result["OUTPUT"].isValid()
     assert len(list(result["OUTPUT"].getFeatures())) > 0
+
+
+@pytest.mark.skipif(
+    QGIS_VERSION < 31800, reason="https://github.com/qgis/QGIS/issues/40564"
+)
+def test_setup_qgis_iface(qgis_iface):
+    assert iface == qgis_iface

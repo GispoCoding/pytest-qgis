@@ -1,4 +1,5 @@
 # pytest-qgis
+
 [![PyPI version](https://badge.fury.io/py/pytest-qgis.svg)](https://badge.fury.io/py/pytest-qgis)
 [![Downloads](https://img.shields.io/pypi/dm/pytest-qgis.svg)](https://pypistats.org/packages/pytest-qgis)
 ![CI](https://github.com/GispoCoding/pytest-qgis/workflows/CI/badge.svg)
@@ -7,27 +8,33 @@
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-
 A [pytest](https://docs.pytest.org) plugin for testing QGIS python plugins.
-
 
 ## Features
 
-This plugin makes it easier to write QGIS plugin tests with the help of some fixtures:
+This plugin makes it easier to write QGIS plugin tests with the help of some fixtures and hooks:
 
-* `qgis_app` initializes and returns fully configured [`QgsApplication`](https://qgis.org/pyqgis/master/core/QgsApplication.html). This fixture is called
-    automatically on the start of pytest session.
-* `qgis_canvas` initializes and returns [`QgsMapCanvas`](https://qgis.org/pyqgis/master/gui/QgsMapCanvas.html)
-* `qgis_iface` returns mocked [`QgsInterface`](https://qgis.org/pyqgis/master/gui/QgisInterface.html)
+### Fixtures
+
+* `qgis_app` returns and eventually exits fully
+  configured [`QgsApplication`](https://qgis.org/pyqgis/master/core/QgsApplication.html). This fixture is called
+  automatically on the start of pytest session.
+* `qgis_canvas` returns [`QgsMapCanvas`](https://qgis.org/pyqgis/master/gui/QgsMapCanvas.html).
+* `qgis_iface` returns stubbed [`QgsInterface`](https://qgis.org/pyqgis/master/gui/QgisInterface.html)
 * `new_project` makes sure that all the map layers and configurations are removed. This should be used with tests that
-    add stuff to [`QgsProject`](https://qgis.org/pyqgis/master/core/QgsProject.html).
-* `qgis_processing` initializes the processing framework. This can be used when testing code that calls `processing.run(...)`.
+  add stuff to [`QgsProject`](https://qgis.org/pyqgis/master/core/QgsProject.html).
+* `qgis_processing` initializes the processing framework. This can be used when testing code that
+  calls `processing.run(...)`.
 
+### Hooks
+
+* `pytest_configure` hook is used to initialize and
+  configure [`QgsApplication`](https://qgis.org/pyqgis/master/core/QgsApplication.html). With QGIS >= 3.18 it is also
+  used to patch `qgis.utils.iface` with `qgis_iface` automatically.
 
 ## Requirements
 
 This pytest plugin requires QGIS >= 3.10 to work.
-
 
 ## Installation
 
@@ -36,7 +43,6 @@ Install with `pip`:
 ```bash
 pip install pytest-qgis
 ```
-
 
 ## Contributing
 
