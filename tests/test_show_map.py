@@ -19,6 +19,8 @@
 import pytest
 from qgis.core import QgsProject, QgsRectangle
 
+from .utils import QGIS_VERSION
+
 """
 These tests are meant to be tested visually by the developer.
 """
@@ -42,19 +44,34 @@ def test_show_map_custom_extent(layer_polygon):
 
 
 @pytest.mark.qgis_show_map(timeout=3)
-def test_show_map_crs_change_to_3067(layer_polygon, layer_polygon_3067, raster_3067):
+@pytest.mark.skipif(
+    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+)
+def test_show_map_crs_change_to_3067(
+    layer_polygon, layer_polygon_3067, raster_3067, qgis_version
+):
     layer_polygon_3067.setOpacity(0.3)
-    raster_3067.setOpacity(0.9)
+    if qgis_version > 31800:
+        raster_3067.setOpacity(0.9)
     QgsProject.instance().addMapLayers([layer_polygon, layer_polygon_3067, raster_3067])
 
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT)
-def test_show_map_crs_change_to_4326(layer_polygon, raster_3067, layer_points):
-    raster_3067.setOpacity(0.9)
+@pytest.mark.skipif(
+    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+)
+def test_show_map_crs_change_to_4326(
+    layer_polygon, raster_3067, layer_points, qgis_version
+):
+    if qgis_version > 31800:
+        raster_3067.setOpacity(0.9)
     QgsProject.instance().addMapLayers([layer_points, raster_3067, layer_polygon])
 
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT)
+@pytest.mark.skipif(
+    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+)
 def test_show_map_crs_change_to_4326_2(layer_polygon, layer_points, layer_polygon_3067):
     QgsProject.instance().addMapLayers(
         [layer_points, layer_polygon_3067, layer_polygon]

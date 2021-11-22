@@ -26,6 +26,8 @@ from pytest_qgis.utils import (
     set_map_crs_based_on_layers,
 )
 
+from .utils import QGIS_VERSION
+
 EPSG_4326 = "EPSG:4326"
 EPSG_3067 = "EPSG:3067"
 
@@ -42,6 +44,9 @@ def layers_added(new_project, layer_polygon, layer_polygon_3067, raster_3067):
     QgsProject.instance().addMapLayers([raster_3067, layer_polygon_3067, layer_polygon])
 
 
+@pytest.mark.skipif(
+    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+)
 def test_get_common_extent_from_all_layers(
     new_project, crs, layer_polygon, layer_polygon_3067
 ):
@@ -49,6 +54,9 @@ def test_get_common_extent_from_all_layers(
     assert get_common_extent_from_all_layers().toString(0) == "23,61 : 32,68"
 
 
+@pytest.mark.skipif(
+    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+)
 def test_set_map_crs_based_on_layers_should_set_4326(new_project, layer_polygon):
     layer_polygon2 = layer_polygon.clone()
     QgsProject.instance().addMapLayers([layer_polygon, layer_polygon2])
@@ -67,6 +75,9 @@ def test_get_layers_with_different_crs(
     assert set(get_layers_with_different_crs()) == {layer_polygon_3067, raster_3067}
 
 
+@pytest.mark.skipif(
+    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+)
 def test_replace_layers_with_reprojected_clones(
     crs, layers_added, qgis_processing, layer_polygon_3067, raster_3067, tmp_path
 ):

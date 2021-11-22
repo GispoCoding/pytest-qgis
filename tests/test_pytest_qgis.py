@@ -21,13 +21,10 @@ import pytest
 from qgis.core import Qgis, QgsProcessing, QgsProject, QgsVectorLayer
 from qgis.utils import iface
 
+from .utils import QGIS_VERSION
+
 if TYPE_CHECKING:
     from _pytest.pytester import Testdir
-
-try:
-    QGIS_VERSION = Qgis.versionInt()
-except AttributeError:
-    QGIS_VERSION = Qgis.QGIS_VERSION_INT
 
 # DO not use this directly, this is only meant to be used with
 # replace_iface_with_qgis_iface fixtrure

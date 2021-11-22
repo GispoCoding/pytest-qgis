@@ -76,9 +76,9 @@ ShowMapSettings = namedtuple(
 )
 
 try:
-    QGIS_VERSION = Qgis.versionInt()
+    _QGIS_VERSION = Qgis.versionInt()
 except AttributeError:
-    QGIS_VERSION = Qgis.QGIS_VERSION_INT
+    _QGIS_VERSION = Qgis.QGIS_VERSION_INT
 
 _APP: Optional[QgsApplication] = None
 _CANVAS: Optional[QgsMapCanvas] = None
@@ -226,6 +226,12 @@ def qgis_show_map(
         )
 
 
+@pytest.fixture(scope="session")
+def qgis_version() -> int:
+    """QGIS version number as integer."""
+    return _QGIS_VERSION
+
+
 def _start_and_configure_qgis_app(config: "Config") -> None:
     global _APP, _CANVAS, _IFACE, _PARENT
     settings: Settings = config._plugin_settings  # type: ignore
@@ -249,7 +255,7 @@ def _start_and_configure_qgis_app(config: "Config") -> None:
     # This only works with QGIS >= 3.18 since before that
     # importing qgis.utils causes RecursionErrors. See this issue for details
     # https://github.com/qgis/QGIS/issues/40564
-    if QGIS_VERSION >= 31800:
+    if _QGIS_VERSION >= 31800:
         from qgis.utils import iface  # noqa # This import is required
 
         mock.patch("qgis.utils.iface", _IFACE).start()

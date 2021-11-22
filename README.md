@@ -25,6 +25,7 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
   add stuff to [`QgsProject`](https://qgis.org/pyqgis/master/core/QgsProject.html).
 * `qgis_processing` initializes the processing framework. This can be used when testing code that
   calls `processing.run(...)`.
+* `qgis_version` returns QGIS version number as integer.
 
 ### Markers
 
