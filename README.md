@@ -26,6 +26,23 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
 * `qgis_processing` initializes the processing framework. This can be used when testing code that
   calls `processing.run(...)`.
 
+### Markers
+
+* `qgis_show_map` lets developer inspect the QGIS map visually at the teardown of the test.  **NOTE**: This marker is
+  still experimental and layer order might differ if using layers with different coordinate systems. Full signature of
+  the marker is:
+  ```python
+  @pytest.mark.qgis_show_map(timeout: int = 30, zoom_to_common_extent: bool = True, extent: QgsRectangle = None)
+  ```
+    * `timeout` is the time in seconds until the map is closed.
+    * `zoom_to_common_extent` when set to True, centers the map around all layers in the project.
+    * `extent` is alternative to `zoom_to_common_extent` and lets user specify the extent
+      as [`QgsRectangle`](https://qgis.org/pyqgis/master/core/QgsRectangle.html)
+
+Check the marker api [documentation](https://docs.pytest.org/en/latest/mark.html)
+and [examples](https://docs.pytest.org/en/latest/example/markers.html#marking-whole-classes-or-modules) for the ways
+markers can be used.
+
 ### Hooks
 
 * `pytest_configure` hook is used to initialize and
