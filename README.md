@@ -44,6 +44,17 @@ Install with `pip`:
 pip install pytest-qgis
 ```
 
+## Development environment
+
+1. Create a virtual environment and activate it.
+2. `pip install pip-tools`
+3. `pip-sync requirements.txt requirements-dev.txt`
+
+### Updating dependencies
+
+1. `pip-compile --upgrade`
+2. `pip-compile --upgrade requirements-dev.in`
+
 ## Contributing
 
 Contributions are very welcome.
