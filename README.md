@@ -32,6 +32,19 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
   configure [`QgsApplication`](https://qgis.org/pyqgis/master/core/QgsApplication.html). With QGIS >= 3.18 it is also
   used to patch `qgis.utils.iface` with `qgis_iface` automatically.
 
+### Command line options
+
+* `--qgis_disable_gui` can be used to disable graphical user interface in tests. This speeds up the tests that use Qt
+  widgets of the plugin.
+
+### ini-options
+
+* `qgis_qui_enabled` whether the QUI will be visible or not. Defaults to `True`. Command line
+  option `--qgis_disable_gui` will override this.
+* `qgis_canvas_width` width of the QGIS canvas in pixels. Defaults to 600.
+* `qgis_canvas_height` height of the QGIS canvas in pixels. Defaults to 600.
+* `qgis_initialize_automatically` whether to autouse `qgis_app` fixture or not. Mainly used in internal testing.
+
 ## Requirements
 
 This pytest plugin requires QGIS >= 3.10 to work.
