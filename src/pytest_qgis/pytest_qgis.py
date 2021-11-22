@@ -53,21 +53,24 @@ if TYPE_CHECKING:
     from _pytest.mark import Mark
 
 DISABLE_GUI_KEY = "qgis_disable_gui"
+DISABLE_QGIS_INIT_KEY = "qgis_disable_init"
 GUI_ENABLED_KEY = "qgis_qui_enabled"
-AUTOUSE_QGIS_KEY = "qgis_initialize_automatically"
 CANVAS_HEIGHT_KEY = "qgis_canvas_height"
 CANVAS_WIDTH_KEY = "qgis_canvas_width"
 SHOW_MAP_MARKER = "qgis_show_map"
 
 GUI_DESCRIPTION = "Set whether the graphical user interface is wanted or not."
-AUTOUSE_QGIS_DESCRIPTION = "Whether to automatically initialize QGIS app or not."
+DISABLE_QGIS_DESCRIPTION = "Prevent QGIS (QgsApllication) from initializing."
 CANVAS_DESCRIPTION = "Set canvas height and width."
+
 DEFAULT_GUI_ENABLED = True
 DEFAULT_AUTOUSE_QGIS = True
 DEFAULT_CANVAS_SIZE = (600, 600)
 DEFAULT_MAP_VISIBILITY_TIMEOUT = 30
 
-Settings = namedtuple("Settings", ["gui_enabled", "canvas_width", "canvas_height"])
+Settings = namedtuple(
+    "Settings", ["gui_enabled", "qgis_init_disabled", "canvas_width", "canvas_height"]
+)
 ShowMapSettings = namedtuple(
     "ShowMapSettings", ["timeout", "zoom_to_common_extent", "extent"]
 )
@@ -91,13 +94,14 @@ def pytest_addoption(parser: "Parser") -> None:
         "Utilities for testing QGIS plugins",
     )
     group.addoption(f"--{DISABLE_GUI_KEY}", action="store_true", help=GUI_DESCRIPTION)
+    group.addoption(
+        f"--{DISABLE_QGIS_INIT_KEY}", action="store_true", help=DISABLE_QGIS_DESCRIPTION
+    )
 
     parser.addini(
         GUI_ENABLED_KEY, GUI_DESCRIPTION, type="bool", default=DEFAULT_GUI_ENABLED
     )
-    parser.addini(
-        AUTOUSE_QGIS_KEY, AUTOUSE_QGIS_KEY, type="bool", default=DEFAULT_AUTOUSE_QGIS
-    )
+
     parser.addini(
         CANVAS_WIDTH_KEY,
         CANVAS_DESCRIPTION,
@@ -134,19 +138,13 @@ def pytest_configure(config: "Config") -> None:
     _start_and_configure_qgis_app(config)
 
 
-@pytest.fixture(autouse=_AUTOUSE_QGIS, scope="session")
+@pytest.fixture(autouse=True, scope="session")
 def qgis_app(request: "SubRequest") -> QgsApplication:
-    if not _AUTOUSE_QGIS:
-        # Initialize QGIS
-        global _APP
-        _APP = QgsApplication(
-            [], GUIenabled=request.config._plugin_settings.gui_enabled
-        )
-        _APP.initQgis()
+    yield _APP if not request.config._plugin_settings.qgis_init_disabled else None
 
-    yield _APP
-    assert _APP
-    _APP.exitQgis()
+    if not request.config._plugin_settings.qgis_init_disabled:
+        assert _APP
+        _APP.exitQgis()
 
 
 @pytest.fixture(scope="session")
@@ -180,7 +178,7 @@ def qgis_processing(qgis_app: QgsApplication) -> None:
     _initialize_processing(qgis_app)
 
 
-@pytest.fixture(autouse=_AUTOUSE_QGIS)
+@pytest.fixture(autouse=True)
 def qgis_show_map(
     qgis_app: QgsApplication,
     qgis_iface: QgisInterface,
@@ -194,7 +192,11 @@ def qgis_show_map(
     show_map_marker = request.node.get_closest_marker(SHOW_MAP_MARKER)
     common_settings: Settings = request.config._plugin_settings  # type: ignore
 
-    if show_map_marker and common_settings.gui_enabled:
+    if (
+        show_map_marker
+        and common_settings.gui_enabled
+        and not common_settings.qgis_init_disabled
+    ):
         qgis_parent.setWindowTitle("Test QGIS dialog opened by Pytest-qgis")
         qgis_parent.show()
     elif show_map_marker and not common_settings.gui_enabled:
@@ -202,10 +204,19 @@ def qgis_show_map(
             "Cannot show QGIS map because the GUI is not enabled. "
             "Set qgis_qui_enabled=True in pytest.ini."
         )
+    elif show_map_marker and common_settings.qgis_init_disabled:
+        warnings.warn(
+            "Cannot show QGIS map because QGIS is not initialized. "
+            "Run the tests without --qgis_disable_init to enable QGIS map."
+        )
 
     yield
 
-    if show_map_marker and common_settings.gui_enabled:
+    if (
+        show_map_marker
+        and common_settings.gui_enabled
+        and not common_settings.qgis_init_disabled
+    ):
         _configure_qgis_map(
             qgis_app,
             qgis_iface,
@@ -224,7 +235,7 @@ def _start_and_configure_qgis_app(config: "Config") -> None:
     config_path = tmp_path_factory.mktemp("qgis-test")
     os.environ["QGIS_CUSTOM_CONFIG_PATH"] = str(config_path)
 
-    if _AUTOUSE_QGIS:
+    if not settings.qgis_init_disabled:
         _APP = QgsApplication([], GUIenabled=settings.gui_enabled)
         _APP.initQgis()
     _PARENT = QWidget()
@@ -303,19 +314,17 @@ def _configure_qgis_map(
 
 
 def _parse_settings(config: "Config") -> Settings:
-    global _AUTOUSE_QGIS
-    _AUTOUSE_QGIS = config.getini(AUTOUSE_QGIS_KEY)
-
     gui_disabled = config.getoption(DISABLE_GUI_KEY)
     if not gui_disabled:
         gui_enabled = config.getini(GUI_ENABLED_KEY)
     else:
         gui_enabled = not gui_disabled
 
+    qgis_init_disabled = config.getoption(DISABLE_QGIS_INIT_KEY)
     canvas_width = int(config.getini(CANVAS_WIDTH_KEY))
     canvas_height = int(config.getini(CANVAS_HEIGHT_KEY))
 
-    return Settings(gui_enabled, canvas_width, canvas_height)
+    return Settings(gui_enabled, qgis_init_disabled, canvas_width, canvas_height)
 
 
 def _parse_show_map_marker(marker: "Mark") -> ShowMapSettings:

@@ -53,6 +53,7 @@ markers can be used.
 
 * `--qgis_disable_gui` can be used to disable graphical user interface in tests. This speeds up the tests that use Qt
   widgets of the plugin.
+* `--qgis_disable_init` can be used to prevent QGIS (QgsApllication) from initializing. Mainly used in internal testing.
 
 ### ini-options
 
@@ -60,7 +61,6 @@ markers can be used.
   option `--qgis_disable_gui` will override this.
 * `qgis_canvas_width` width of the QGIS canvas in pixels. Defaults to 600.
 * `qgis_canvas_height` height of the QGIS canvas in pixels. Defaults to 600.
-* `qgis_initialize_automatically` whether to autouse `qgis_app` fixture or not. Mainly used in internal testing.
 
 ## Requirements
 

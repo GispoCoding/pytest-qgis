@@ -113,7 +113,7 @@ def test_ini_canvas(testdir: "Testdir"):
             assert qgis_canvas.height() == 1000
     """
     )
-    result = testdir.runpytest()
+    result = testdir.runpytest("--qgis_disable_init")
     result.assert_outcomes(passed=1)
 
 
@@ -136,10 +136,10 @@ def test_ini_gui(gui_enabled: bool, testdir: "Testdir"):
             "{'offscreen' if not gui_enabled else ''}")
     """
     )
-    result = testdir.runpytest()
+    result = testdir.runpytest("--qgis_disable_init")
     result.assert_outcomes(passed=1)
 
-    result = testdir.runpytest("--qgis_disable_gui")
+    result = testdir.runpytest("--qgis_disable_init", "--qgis_disable_gui")
     result.assert_outcomes(
         passed=1 if not gui_enabled else 0, failed=1 if gui_enabled else 0
     )
