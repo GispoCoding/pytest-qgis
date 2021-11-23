@@ -15,6 +15,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
+import shutil
 from pathlib import Path
 
 import pytest
@@ -23,11 +24,12 @@ from qgis.core import QgsRasterLayer, QgsVectorLayer
 pytest_plugins = "pytester"
 
 
-@pytest.fixture(scope="session")
-def gpkg() -> Path:
+@pytest.fixture()
+def gpkg(tmp_path: Path) -> Path:
     db = Path(Path(__file__).parent, "data", "db.gpkg")
-    assert db.exists()
-    return db
+    new_db_path = tmp_path / "db.gpkg"
+    shutil.copy(db, new_db_path)
+    return new_db_path
 
 
 @pytest.fixture()
