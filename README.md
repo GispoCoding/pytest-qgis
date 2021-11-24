@@ -33,9 +33,10 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
   still experimental and layer order might differ if using layers with different coordinate systems. Full signature of
   the marker is:
   ```python
-  @pytest.mark.qgis_show_map(timeout: int = 30, zoom_to_common_extent: bool = True, extent: QgsRectangle = None)
+  @pytest.mark.qgis_show_map(timeout: int = 30, add_basemap: bool = False, zoom_to_common_extent: bool = True, extent: QgsRectangle = None)
   ```
     * `timeout` is the time in seconds until the map is closed.
+    * `add_basemap` when set to True, adds Natural Earth countries layer as the basemap for the map.
     * `zoom_to_common_extent` when set to True, centers the map around all layers in the project.
     * `extent` is alternative to `zoom_to_common_extent` and lets user specify the extent
       as [`QgsRectangle`](https://qgis.org/pyqgis/master/core/QgsRectangle.html)

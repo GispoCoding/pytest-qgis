@@ -30,7 +30,7 @@ from unittest import mock
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from qgis.core import Qgis, QgsApplication, QgsProject, QgsRectangle
+from qgis.core import Qgis, QgsApplication, QgsProject, QgsRectangle, QgsVectorLayer
 from qgis.gui import QgisInterface as QgisInterfaceOrig
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
@@ -40,6 +40,7 @@ from qgis.PyQt.QtWidgets import QMessageBox, QWidget
 from pytest_qgis.mock_qgis_classes import MockMessageBar
 from pytest_qgis.qgis_interface import QgisInterface
 from pytest_qgis.utils import (
+    clean_qgis_layer,
     get_common_extent_from_all_layers,
     get_layers_with_different_crs,
     replace_layers_with_reprojected_clones,
@@ -72,7 +73,7 @@ Settings = namedtuple(
     "Settings", ["gui_enabled", "qgis_init_disabled", "canvas_width", "canvas_height"]
 )
 ShowMapSettings = namedtuple(
-    "ShowMapSettings", ["timeout", "zoom_to_common_extent", "extent"]
+    "ShowMapSettings", ["timeout", "add_basemap", "zoom_to_common_extent", "extent"]
 )
 
 try:
@@ -121,12 +122,14 @@ def pytest_configure(config: "Config") -> None:
     """Configure and initialize qgis session for all tests."""
     config.addinivalue_line(
         "markers",
-        f"{SHOW_MAP_MARKER}(timeout={DEFAULT_MAP_VISIBILITY_TIMEOUT}, zoom_to_common_extent=True, extent=None): "  # noqa E501
+        f"{SHOW_MAP_MARKER}(timeout={DEFAULT_MAP_VISIBILITY_TIMEOUT}, add_basemap=False, zoom_to_common_extent=True, extent=None): "  # noqa E501
         "Show QGIS map for a short amount of time. "
         "The first keyword, *timeout*, is the timeout in seconds until "
-        "the map closes, the second keyword *zoom_to_common_extent*, "
+        "the map closes. The second keyword *add_basemap*, when set to True, "
+        "adds Natural Earth countries layer as the basemap for the map. "
+        "The third keyword *zoom_to_common_extent*, "
         "when set to True, centers the map around all layers in the project.  "
-        "Alternatively the third keyword *extent* can be provided as QgsRectangle.",
+        "Alternatively the fourth keyword *extent* can be provided as QgsRectangle.",
     )
 
     settings = _parse_settings(config)
@@ -178,11 +181,27 @@ def qgis_processing(qgis_app: QgsApplication) -> None:
     _initialize_processing(qgis_app)
 
 
+@pytest.fixture()
+@clean_qgis_layer
+def qgis_natural_earth_countries() -> QgsVectorLayer:
+    """
+    Natural Earth countries in 50m resolution as QgsVectorLayer
+
+    Made with Natural Earth. Free vector and raster map data @ naturalearthdata.com
+    """
+    path_to_data = Path(__file__).parent / "data" / "ne_50m_admin_0_countries.geojson"
+    assert path_to_data.exists(), path_to_data
+    ne_countries = QgsVectorLayer(str(path_to_data), "Natural Earth Countries", "ogr")
+    assert ne_countries.isValid()
+    return ne_countries
+
+
 @pytest.fixture(autouse=True)
 def qgis_show_map(
     qgis_app: QgsApplication,
     qgis_iface: QgisInterface,
     qgis_parent: QWidget,
+    qgis_natural_earth_countries: QgsVectorLayer,
     tmp_path: Path,
     request: "SubRequest",
 ) -> None:
@@ -198,6 +217,7 @@ def qgis_show_map(
         and not common_settings.qgis_init_disabled
     ):
         qgis_parent.setWindowTitle("Test QGIS dialog opened by Pytest-qgis")
+
         qgis_parent.show()
     elif show_map_marker and not common_settings.gui_enabled:
         warnings.warn(
@@ -223,6 +243,7 @@ def qgis_show_map(
             qgis_parent,
             _parse_show_map_marker(show_map_marker),
             tmp_path,
+            qgis_natural_earth_countries,
         )
 
 
@@ -276,6 +297,7 @@ def _configure_qgis_map(
     qgis_parent: QWidget,
     settings: ShowMapSettings,
     tmp_path: Path,
+    qgis_natural_earth_countries: QgsVectorLayer,
 ) -> None:
     message_box = QMessageBox(qgis_parent)
     try:
@@ -294,6 +316,15 @@ def _configure_qgis_map(
         if layers_with_different_crs:
             _initialize_processing(qgis_app)
             replace_layers_with_reprojected_clones(layers_with_different_crs, tmp_path)
+
+        if settings.add_basemap:
+            # Add Natural Earth Countries
+            QgsProject.instance().addMapLayer(qgis_natural_earth_countries)
+            if qgis_natural_earth_countries.crs() != QgsProject.instance().crs():
+                _initialize_processing(qgis_app)
+                replace_layers_with_reprojected_clones(
+                    [qgis_natural_earth_countries], tmp_path
+                )
 
         QgsProject.instance().reloadAllLayers()
         qgis_iface.mapCanvas().refreshAllLayers()
@@ -334,11 +365,13 @@ def _parse_settings(config: "Config") -> Settings:
 
 
 def _parse_show_map_marker(marker: "Mark") -> ShowMapSettings:
-    timeout = zoom_to_common_extent = extent = notset = object()
+    timeout = add_basemap = zoom_to_common_extent = extent = notset = object()
 
     for kwarg, value in marker.kwargs.items():
         if kwarg == "timeout":
             timeout = value
+        elif kwarg == "add_basemap":
+            add_basemap = value
         elif kwarg == "zoom_to_common_extent":
             zoom_to_common_extent = value
         elif kwarg == "extent":
@@ -352,24 +385,33 @@ def _parse_show_map_marker(marker: "Mark") -> ShowMapSettings:
         raise TypeError("Multiple values for timeout argument of qgis_show_map marker")
     elif len(marker.args) >= 1:
         timeout = marker.args[0]
-    if len(marker.args) >= 2 and zoom_to_common_extent is not notset:
+    if len(marker.args) >= 2 and add_basemap is not notset:
+        raise TypeError(
+            "Multiple values for add_basemap argument of qgis_show_map marker"
+        )
+    elif len(marker.args) >= 2:
+        add_basemap = marker.args[1]
+    if len(marker.args) >= 3 and zoom_to_common_extent is not notset:
         raise TypeError(
             "Multiple values for zoom_to_common_extent argument of qgis_show_map marker"
         )
-    elif len(marker.args) >= 2:
-        zoom_to_common_extent = marker.args[1]
-    if len(marker.args) >= 3 and extent is not notset:
-        raise TypeError("Multiple values for extent argument of qgis_show_map marker")
     elif len(marker.args) >= 3:
-        extent = marker.args[2]
-    if len(marker.args) > 3:
+        zoom_to_common_extent = marker.args[2]
+    if len(marker.args) >= 4 and extent is not notset:
+        raise TypeError("Multiple values for extent argument of qgis_show_map marker")
+    elif len(marker.args) >= 4:
+        extent = marker.args[3]
+    if len(marker.args) > 4:
         raise TypeError("Too many arguments for qgis_show_map marker")
+
     if timeout is notset:
         timeout = DEFAULT_MAP_VISIBILITY_TIMEOUT
+    if add_basemap is notset:
+        add_basemap = False
     if zoom_to_common_extent is notset:
         zoom_to_common_extent = True
     if extent is notset:
         extent = None
     elif not isinstance(extent, QgsRectangle):
         raise TypeError("Extent has to be of type QgsRectangle")
-    return ShowMapSettings(timeout, zoom_to_common_extent, extent)
+    return ShowMapSettings(timeout, add_basemap, zoom_to_common_extent, extent)
