@@ -21,6 +21,8 @@ from pathlib import Path
 import pytest
 from qgis.core import QgsRasterLayer, QgsVectorLayer
 
+from pytest_qgis.utils import clean_qgis_layer
+
 pytest_plugins = "pytester"
 
 
@@ -33,16 +35,19 @@ def gpkg(tmp_path: Path) -> Path:
 
 
 @pytest.fixture()
+@clean_qgis_layer
 def layer_polygon(gpkg: Path):
     return get_gpkg_layer("polygon", gpkg)
 
 
 @pytest.fixture()
+@clean_qgis_layer
 def layer_polygon_3067(gpkg: Path):
     return get_gpkg_layer("polygon_3067", gpkg)
 
 
 @pytest.fixture()
+@clean_qgis_layer
 def raster_3067():
     return get_raster_layer(
         "small raster 3067", Path(Path(__file__).parent, "data", "small_raster.tif")
@@ -50,6 +55,7 @@ def raster_3067():
 
 
 @pytest.fixture()
+@clean_qgis_layer
 def layer_points(gpkg: Path):
     return get_gpkg_layer("points", gpkg)
 

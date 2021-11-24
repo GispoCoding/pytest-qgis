@@ -44,6 +44,23 @@ Check the marker api [documentation](https://docs.pytest.org/en/latest/mark.html
 and [examples](https://docs.pytest.org/en/latest/example/markers.html#marking-whole-classes-or-modules) for the ways
 markers can be used.
 
+### Utility tools
+
+* `clean_qgis_layer` decorator found in `pytest_qgis.utils` is a decorator which can be used with `QgsMapLayer` fixtures to ensure that they are cleaned properly if they are used but not added to the `QgsProject`. This is only needed with layers with other than memory provider.
+   ```python
+   # conftest.py of start of a test file
+   import pytest
+   from pytest_qgis.utils import clean_qgis_layer
+   from qgis.core import QgsVectorLayer
+
+   @pytest.fixture()
+   @clean_qgis_layer
+   def some_layer() -> QgsVectorLayer:
+     return QgsVectorLayer("layer_file.geojson", "some layer")
+
+   ```
+
+
 ### Hooks
 
 * `pytest_configure` hook is used to initialize and

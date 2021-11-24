@@ -17,9 +17,11 @@
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 #
 from collections import Counter
+from functools import wraps
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Callable, List, Optional
 
+import sip
 from osgeo import gdal
 from qgis.core import (
     QgsCoordinateReferenceSystem,
@@ -170,3 +172,27 @@ def copy_layer_style_and_position(
     # TODO: it does not seem to matter how this is used.
     #  All new layers appear at he bottom...
     group.insertLayer(index + 1, layer2)
+
+
+def clean_qgis_layer(fn: Callable) -> Callable:
+    """
+    Decorator to ensure that the QGIS layer (fixture) is cleaned properly.
+
+    Sometimes fixture non-memory layers that are used but not added
+    to the project might cause segmentation fault errors.
+    """
+
+    @wraps(fn)
+    def wrapper(*args: Any, **kwargs: Any) -> QgsMapLayer:
+        layer: QgsMapLayer = fn(*args, **kwargs)
+        yield layer
+
+        if (
+            isinstance(layer, QgsMapLayer)
+            and not sip.isdeleted(layer)
+            and layer.id() not in QgsProject.instance().mapLayers(True).keys()
+        ):
+            QgsProject.instance().addMapLayer(layer)
+            QgsProject.instance().removeMapLayer(layer)
+
+    return wrapper
