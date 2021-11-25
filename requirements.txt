@@ -4,11 +4,7 @@
 #
 #    pip-compile
 #
-atomicwrites==1.4.0
-    # via pytest
 attrs==21.2.0
-    # via pytest
-colorama==0.4.4
     # via pytest
 iniconfig==1.1.1
     # via pytest

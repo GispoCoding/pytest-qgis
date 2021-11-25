@@ -15,15 +15,16 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
+from typing import TYPE_CHECKING
 
 import pytest
 from qgis.core import Qgis, QgsProcessing, QgsProject, QgsVectorLayer
 from qgis.utils import iface
 
-try:
-    QGIS_VERSION = Qgis.versionInt()
-except AttributeError:
-    QGIS_VERSION = Qgis.QGIS_VERSION_INT
+from .utils import QGIS_VERSION
+
+if TYPE_CHECKING:
+    from _pytest.pytester import Testdir
 
 # DO not use this directly, this is only meant to be used with
 # replace_iface_with_qgis_iface fixtrure
@@ -52,7 +53,7 @@ def test_add_layer():
     assert set(QgsProject.instance().mapLayers().values()) == {layer}
 
 
-def test_new_project(new_project):
+def test_qgis_new_project(qgis_new_project):
     assert QgsProject.instance().mapLayers() == {}
 
 
@@ -91,3 +92,49 @@ def test_processing_run(qgis_processing):
 )
 def test_setup_qgis_iface(qgis_iface):
     assert iface == qgis_iface
+
+
+def test_ini_canvas(testdir: "Testdir"):
+    testdir.makeini(
+        """
+        [pytest]
+        qgis_canvas_height=1000
+        qgis_canvas_width=1200
+    """
+    )
+    testdir.makepyfile(
+        """
+        def test_canvas(qgis_canvas):
+            assert qgis_canvas.width() == 1200
+            assert qgis_canvas.height() == 1000
+    """
+    )
+    result = testdir.runpytest("--qgis_disable_init")
+    result.assert_outcomes(passed=1)
+
+
+@pytest.mark.parametrize("gui_enabled", [True, False])
+def test_ini_gui(gui_enabled: bool, testdir: "Testdir"):
+    testdir.makeini(
+        f"""
+        [pytest]
+        qgis_qui_enabled={gui_enabled}
+    """
+    )
+
+    testdir.makepyfile(
+        f"""
+        import os
+
+        def test_offscreen(qgis_new_project):
+            assert (os.environ.get("QT_QPA_PLATFORM", "") ==
+            "{'offscreen' if not gui_enabled else ''}")
+    """
+    )
+    result = testdir.runpytest("--qgis_disable_init")
+    result.assert_outcomes(passed=1)
+
+    result = testdir.runpytest("--qgis_disable_init", "--qgis_disable_gui")
+    result.assert_outcomes(
+        passed=1 if not gui_enabled else 0, failed=1 if gui_enabled else 0
+    )
