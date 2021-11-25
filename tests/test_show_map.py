@@ -29,7 +29,7 @@ DEFAULT_TIMEOUT = 1
 
 
 @pytest.fixture(autouse=True)
-def setup(new_project):
+def setup(qgis_new_project):
     pass
 
 

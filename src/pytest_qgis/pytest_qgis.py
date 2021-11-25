@@ -182,10 +182,24 @@ def qgis_processing(qgis_app: QgsApplication) -> None:
 
 
 @pytest.fixture()
-def new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
+def qgis_new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
     """
     Initializes new QGIS project by removing layers and relations etc.
     """
+    qgis_iface.newProject()
+
+
+@pytest.fixture()
+def new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
+    """
+    Initializes new QGIS project by removing layers and relations etc.
+
+    Deprecated: use qgis_new_project instead.
+    """
+    warnings.warn(
+        "new_project fixture will be deprecated. " "Use qgis_new_project instead.",
+        PendingDeprecationWarning,
+    )
     qgis_iface.newProject()
 
 

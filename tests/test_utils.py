@@ -42,7 +42,7 @@ def crs():
 
 
 @pytest.fixture()
-def layers_added(new_project, layer_polygon, layer_polygon_3067, raster_3067):
+def layers_added(qgis_new_project, layer_polygon, layer_polygon_3067, raster_3067):
     QgsProject.instance().addMapLayers([raster_3067, layer_polygon_3067, layer_polygon])
 
 
@@ -50,7 +50,7 @@ def layers_added(new_project, layer_polygon, layer_polygon_3067, raster_3067):
     QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
 )
 def test_get_common_extent_from_all_layers(
-    new_project, crs, layer_polygon, layer_polygon_3067
+    qgis_new_project, crs, layer_polygon, layer_polygon_3067
 ):
     QgsProject.instance().addMapLayers([layer_polygon, layer_polygon_3067])
     assert get_common_extent_from_all_layers().toString(0) == "23,61 : 32,68"
@@ -59,7 +59,7 @@ def test_get_common_extent_from_all_layers(
 @pytest.mark.skipif(
     QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
 )
-def test_set_map_crs_based_on_layers_should_set_4326(new_project, layer_polygon):
+def test_set_map_crs_based_on_layers_should_set_4326(qgis_new_project, layer_polygon):
     layer_polygon2 = layer_polygon.clone()
     QgsProject.instance().addMapLayers([layer_polygon, layer_polygon2])
     set_map_crs_based_on_layers()

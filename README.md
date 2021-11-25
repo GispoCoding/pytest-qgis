@@ -22,7 +22,7 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
 * `qgis_canvas` returns [`QgsMapCanvas`](https://qgis.org/pyqgis/master/gui/QgsMapCanvas.html).
 * `qgis_parent` returns the QWidget used as parent of the `qgis_canvas`
 * `qgis_iface` returns stubbed [`QgsInterface`](https://qgis.org/pyqgis/master/gui/QgisInterface.html)
-* `new_project` makes sure that all the map layers and configurations are removed. This should be used with tests that
+* `qgis_new_project` makes sure that all the map layers and configurations are removed. This should be used with tests that
   add stuff to [`QgsProject`](https://qgis.org/pyqgis/master/core/QgsProject.html).
 * `qgis_processing` initializes the processing framework. This can be used when testing code that
   calls `processing.run(...)`.

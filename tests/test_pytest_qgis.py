@@ -53,7 +53,7 @@ def test_add_layer():
     assert set(QgsProject.instance().mapLayers().values()) == {layer}
 
 
-def test_new_project(new_project):
+def test_qgis_new_project(qgis_new_project):
     assert QgsProject.instance().mapLayers() == {}
 
 
@@ -126,7 +126,7 @@ def test_ini_gui(gui_enabled: bool, testdir: "Testdir"):
         f"""
         import os
 
-        def test_offscreen(new_project):
+        def test_offscreen(qgis_new_project):
             assert (os.environ.get("QT_QPA_PLATFORM", "") ==
             "{'offscreen' if not gui_enabled else ''}")
     """
