@@ -98,7 +98,6 @@ def test_ini_canvas(testdir: "Testdir"):
     testdir.makeini(
         """
         [pytest]
-        qgis_initialize_automatically=False
         qgis_canvas_height=1000
         qgis_canvas_width=1200
     """
@@ -119,7 +118,6 @@ def test_ini_gui(gui_enabled: bool, testdir: "Testdir"):
     testdir.makeini(
         f"""
         [pytest]
-        qgis_initialize_automatically=False
         qgis_qui_enabled={gui_enabled}
     """
     )

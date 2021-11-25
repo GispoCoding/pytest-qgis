@@ -54,22 +54,6 @@ if TYPE_CHECKING:
     from _pytest.fixtures import SubRequest
     from _pytest.mark import Mark
 
-DISABLE_GUI_KEY = "qgis_disable_gui"
-DISABLE_QGIS_INIT_KEY = "qgis_disable_init"
-GUI_ENABLED_KEY = "qgis_qui_enabled"
-CANVAS_HEIGHT_KEY = "qgis_canvas_height"
-CANVAS_WIDTH_KEY = "qgis_canvas_width"
-SHOW_MAP_MARKER = "qgis_show_map"
-
-GUI_DESCRIPTION = "Set whether the graphical user interface is wanted or not."
-DISABLE_QGIS_DESCRIPTION = "Prevent QGIS (QgsApllication) from initializing."
-CANVAS_DESCRIPTION = "Set canvas height and width."
-
-DEFAULT_GUI_ENABLED = True
-DEFAULT_AUTOUSE_QGIS = True
-DEFAULT_CANVAS_SIZE = (600, 600)
-DEFAULT_MAP_VISIBILITY_TIMEOUT = 30
-
 Settings = namedtuple(
     "Settings", ["gui_enabled", "qgis_init_disabled", "canvas_width", "canvas_height"]
 )
@@ -77,16 +61,41 @@ ShowMapSettings = namedtuple(
     "ShowMapSettings", ["timeout", "add_basemap", "zoom_to_common_extent", "extent"]
 )
 
-try:
-    _QGIS_VERSION = Qgis.versionInt()
-except AttributeError:
-    _QGIS_VERSION = Qgis.QGIS_VERSION_INT
+GUI_DISABLE_KEY = "qgis_disable_gui"
+GUI_ENABLED_KEY = "qgis_qui_enabled"
+GUI_DESCRIPTION = "Set whether the graphical user interface is wanted or not."
+GUI_ENABLED_DEFAULT = True
+
+CANVAS_HEIGHT_KEY = "qgis_canvas_height"
+CANVAS_WIDTH_KEY = "qgis_canvas_width"
+CANVAS_DESCRIPTION = "Set canvas height and width."
+CANVAS_SIZE_DEFAULT = (600, 600)
+
+DISABLE_QGIS_INIT_KEY = "qgis_disable_init"
+DISABLE_QGIS_INIT_DESCRIPTION = "Prevent QGIS (QgsApllication) from initializing."
+
+SHOW_MAP_MARKER = "qgis_show_map"
+SHOW_MAP_VISIBILITY_TIMEOUT_DEFAULT = 30
+SHOW_MAP_MARKER_DESCRIPTION = (
+    f"{SHOW_MAP_MARKER}(timeout={SHOW_MAP_VISIBILITY_TIMEOUT_DEFAULT}, add_basemap=False, zoom_to_common_extent=True, extent=None): "  # noqa: E501
+    f"Show QGIS map for a short amount of time. The first keyword, *timeout*, is the "
+    f"timeout in seconds until the map closes. The second keyword *add_basemap*, "
+    f"when set to True, adds Natural Earth countries layer as the basemap for the map. "
+    f"The third keyword *zoom_to_common_extent*, when set to True, centers the map "
+    f"around all layers in the project. Alternatively the fourth keyword *extent* "
+    f"can be provided as QgsRectangle."
+)
 
 _APP: Optional[QgsApplication] = None
 _CANVAS: Optional[QgsMapCanvas] = None
 _IFACE: Optional[QgisInterface] = None
 _PARENT: Optional[QtWidgets.QWidget] = None
 _AUTOUSE_QGIS: Optional[bool] = None
+
+try:
+    _QGIS_VERSION = Qgis.versionInt()
+except AttributeError:
+    _QGIS_VERSION = Qgis.QGIS_VERSION_INT
 
 
 @pytest.hookimpl()
@@ -95,43 +104,35 @@ def pytest_addoption(parser: "Parser") -> None:
         "qgis",
         "Utilities for testing QGIS plugins",
     )
-    group.addoption(f"--{DISABLE_GUI_KEY}", action="store_true", help=GUI_DESCRIPTION)
+    group.addoption(f"--{GUI_DISABLE_KEY}", action="store_true", help=GUI_DESCRIPTION)
     group.addoption(
-        f"--{DISABLE_QGIS_INIT_KEY}", action="store_true", help=DISABLE_QGIS_DESCRIPTION
+        f"--{DISABLE_QGIS_INIT_KEY}",
+        action="store_true",
+        help=DISABLE_QGIS_INIT_DESCRIPTION,
     )
 
     parser.addini(
-        GUI_ENABLED_KEY, GUI_DESCRIPTION, type="bool", default=DEFAULT_GUI_ENABLED
+        GUI_ENABLED_KEY, GUI_DESCRIPTION, type="bool", default=GUI_ENABLED_DEFAULT
     )
 
     parser.addini(
         CANVAS_WIDTH_KEY,
         CANVAS_DESCRIPTION,
         type="string",
-        default=DEFAULT_CANVAS_SIZE[0],
+        default=CANVAS_SIZE_DEFAULT[0],
     )
     parser.addini(
         CANVAS_HEIGHT_KEY,
         CANVAS_DESCRIPTION,
         type="string",
-        default=DEFAULT_CANVAS_SIZE[1],
+        default=CANVAS_SIZE_DEFAULT[1],
     )
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_configure(config: "Config") -> None:
     """Configure and initialize qgis session for all tests."""
-    config.addinivalue_line(
-        "markers",
-        f"{SHOW_MAP_MARKER}(timeout={DEFAULT_MAP_VISIBILITY_TIMEOUT}, add_basemap=False, zoom_to_common_extent=True, extent=None): "  # noqa E501
-        "Show QGIS map for a short amount of time. "
-        "The first keyword, *timeout*, is the timeout in seconds until "
-        "the map closes. The second keyword *add_basemap*, when set to True, "
-        "adds Natural Earth countries layer as the basemap for the map. "
-        "The third keyword *zoom_to_common_extent*, "
-        "when set to True, centers the map around all layers in the project.  "
-        "Alternatively the fourth keyword *extent* can be provided as QgsRectangle.",
-    )
+    config.addinivalue_line("markers", SHOW_MAP_MARKER_DESCRIPTION)
 
     settings = _parse_settings(config)
     config._plugin_settings = settings
@@ -162,16 +163,14 @@ def qgis_canvas() -> QgsMapCanvas:
 
 
 @pytest.fixture(scope="session")
+def qgis_version() -> int:
+    """QGIS version number as integer."""
+    return _QGIS_VERSION
+
+
+@pytest.fixture(scope="session")
 def qgis_iface() -> QgisInterfaceOrig:
     return _IFACE
-
-
-@pytest.fixture()
-def new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
-    """
-    Initializes new QGIS project by removing layers and relations etc.
-    """
-    qgis_iface.newProject()
 
 
 @pytest.fixture(scope="session")
@@ -180,6 +179,14 @@ def qgis_processing(qgis_app: QgsApplication) -> None:
     Initializes QGIS processing framework
     """
     _initialize_processing(qgis_app)
+
+
+@pytest.fixture()
+def new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
+    """
+    Initializes new QGIS project by removing layers and relations etc.
+    """
+    qgis_iface.newProject()
 
 
 @pytest.fixture()
@@ -197,7 +204,6 @@ def qgis_world_map_geopackage(tmp_path: Path) -> Path:
         QgsApplication.pkgDataPath(), "resources", "data", "world_map.gpkg"
     )
     assert world_map_gpkg.exists(), world_map_gpkg
-
     # Copy the geopackage to allow modifications
     path_to_copied_geopackage = Path(shutil.copy(world_map_gpkg, tmp_path))
     return path_to_copied_geopackage
@@ -234,24 +240,8 @@ def qgis_show_map(
     show_map_marker = request.node.get_closest_marker(SHOW_MAP_MARKER)
     common_settings: Settings = request.config._plugin_settings  # type: ignore
 
-    if (
-        show_map_marker
-        and common_settings.gui_enabled
-        and not common_settings.qgis_init_disabled
-    ):
-        qgis_parent.setWindowTitle("Test QGIS dialog opened by Pytest-qgis")
-
-        qgis_parent.show()
-    elif show_map_marker and not common_settings.gui_enabled:
-        warnings.warn(
-            "Cannot show QGIS map because the GUI is not enabled. "
-            "Set qgis_qui_enabled=True in pytest.ini."
-        )
-    elif show_map_marker and common_settings.qgis_init_disabled:
-        warnings.warn(
-            "Cannot show QGIS map because QGIS is not initialized. "
-            "Run the tests without --qgis_disable_init to enable QGIS map."
-        )
+    if show_map_marker:
+        _show_qgis_dlg(common_settings, qgis_parent)
 
     yield
 
@@ -268,12 +258,6 @@ def qgis_show_map(
             tmp_path,
             qgis_countries_layer,
         )
-
-
-@pytest.fixture(scope="session")
-def qgis_version() -> int:
-    """QGIS version number as integer."""
-    return _QGIS_VERSION
 
 
 def _start_and_configure_qgis_app(config: "Config") -> None:
@@ -312,6 +296,22 @@ def _initialize_processing(qgis_app: QgsApplication) -> None:
     from processing.core.Processing import Processing
 
     Processing.initialize()
+
+
+def _show_qgis_dlg(common_settings: Settings, qgis_parent: QWidget) -> None:
+    if common_settings.gui_enabled and not common_settings.qgis_init_disabled:
+        qgis_parent.setWindowTitle("Test QGIS dialog opened by Pytest-qgis")
+        qgis_parent.show()
+    elif not common_settings.gui_enabled:
+        warnings.warn(
+            "Cannot show QGIS map because the GUI is not enabled. "
+            "Set qgis_qui_enabled=True in pytest.ini."
+        )
+    elif common_settings.qgis_init_disabled:
+        warnings.warn(
+            "Cannot show QGIS map because QGIS is not initialized. "
+            "Run the tests without --qgis_disable_init to enable QGIS map."
+        )
 
 
 def _configure_qgis_map(
@@ -372,7 +372,7 @@ def _configure_qgis_map(
 
 
 def _parse_settings(config: "Config") -> Settings:
-    gui_disabled = config.getoption(DISABLE_GUI_KEY)
+    gui_disabled = config.getoption(GUI_DISABLE_KEY)
     if not gui_disabled:
         gui_enabled = config.getini(GUI_ENABLED_KEY)
     else:
@@ -426,7 +426,7 @@ def _parse_show_map_marker(marker: "Mark") -> ShowMapSettings:
         raise TypeError("Too many arguments for qgis_show_map marker")
 
     if timeout is notset:
-        timeout = DEFAULT_MAP_VISIBILITY_TIMEOUT
+        timeout = SHOW_MAP_VISIBILITY_TIMEOUT_DEFAULT
     if add_basemap is notset:
         add_basemap = False
     if zoom_to_common_extent is notset:
