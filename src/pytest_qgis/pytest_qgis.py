@@ -20,6 +20,7 @@
 
 
 import os.path
+import shutil
 import sys
 import time
 import warnings
@@ -182,17 +183,39 @@ def qgis_processing(qgis_app: QgsApplication) -> None:
 
 
 @pytest.fixture()
-@clean_qgis_layer
-def qgis_natural_earth_countries() -> QgsVectorLayer:
+def qgis_world_map_geopackage(tmp_path: Path) -> Path:
     """
-    Natural Earth countries in 50m resolution as QgsVectorLayer
+    Path to natural world map geopackage containing Natural Earth data.
+    This geopackage can be modified in any way.
 
-    Made with Natural Earth. Free vector and raster map data @ naturalearthdata.com
+    Layers:
+    * countries
+    * disputed_borders
+    * states_provinces
     """
-    path_to_data = Path(__file__).parent / "data" / "ne_50m_admin_0_countries.geojson"
-    assert path_to_data.exists(), path_to_data
-    ne_countries = QgsVectorLayer(str(path_to_data), "Natural Earth Countries", "ogr")
-    assert ne_countries.isValid()
+    world_map_gpkg = Path(
+        QgsApplication.pkgDataPath(), "resources", "data", "world_map.gpkg"
+    )
+    assert world_map_gpkg.exists(), world_map_gpkg
+
+    # Copy the geopackage to allow modifications
+    path_to_copied_geopackage = Path(shutil.copy(world_map_gpkg, tmp_path))
+    return path_to_copied_geopackage
+
+
+@pytest.fixture()
+@clean_qgis_layer
+def qgis_countries_layer(qgis_world_map_geopackage: Path) -> QgsVectorLayer:
+    """
+    Natural Earth countries as a QgsVectorLayer.
+    """
+
+    ne_countries = QgsVectorLayer(
+        f"{qgis_world_map_geopackage}|layername=countries",
+        "Natural Earth Countries",
+        "ogr",
+    )
+    assert ne_countries.isValid(), qgis_world_map_geopackage
     return ne_countries
 
 
@@ -201,7 +224,7 @@ def qgis_show_map(
     qgis_app: QgsApplication,
     qgis_iface: QgisInterface,
     qgis_parent: QWidget,
-    qgis_natural_earth_countries: QgsVectorLayer,
+    qgis_countries_layer: QgsVectorLayer,
     tmp_path: Path,
     request: "SubRequest",
 ) -> None:
@@ -243,7 +266,7 @@ def qgis_show_map(
             qgis_parent,
             _parse_show_map_marker(show_map_marker),
             tmp_path,
-            qgis_natural_earth_countries,
+            qgis_countries_layer,
         )
 
 
@@ -297,7 +320,7 @@ def _configure_qgis_map(
     qgis_parent: QWidget,
     settings: ShowMapSettings,
     tmp_path: Path,
-    qgis_natural_earth_countries: QgsVectorLayer,
+    qgis_countries_layer: QgsVectorLayer,
 ) -> None:
     message_box = QMessageBox(qgis_parent)
     try:
@@ -319,12 +342,10 @@ def _configure_qgis_map(
 
         if settings.add_basemap:
             # Add Natural Earth Countries
-            QgsProject.instance().addMapLayer(qgis_natural_earth_countries)
-            if qgis_natural_earth_countries.crs() != QgsProject.instance().crs():
+            QgsProject.instance().addMapLayer(qgis_countries_layer)
+            if qgis_countries_layer.crs() != QgsProject.instance().crs():
                 _initialize_processing(qgis_app)
-                replace_layers_with_reprojected_clones(
-                    [qgis_natural_earth_countries], tmp_path
-                )
+                replace_layers_with_reprojected_clones([qgis_countries_layer], tmp_path)
 
         QgsProject.instance().reloadAllLayers()
         qgis_iface.mapCanvas().refreshAllLayers()

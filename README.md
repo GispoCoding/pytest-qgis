@@ -26,6 +26,8 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
 * `qgis_processing` initializes the processing framework. This can be used when testing code that
   calls `processing.run(...)`.
 * `qgis_version` returns QGIS version number as integer.
+* `qgis_world_map_geopackage` returns Path to the world_map.gpkg that ships with QGIS
+* `qgis_countries_layer` returns Natural Earth countries layer from world.map.gpkg as QgsVectorLayer
 
 ### Markers
 
@@ -47,7 +49,9 @@ markers can be used.
 
 ### Utility tools
 
-* `clean_qgis_layer` decorator found in `pytest_qgis.utils` is a decorator which can be used with `QgsMapLayer` fixtures to ensure that they are cleaned properly if they are used but not added to the `QgsProject`. This is only needed with layers with other than memory provider.
+* `clean_qgis_layer` decorator found in `pytest_qgis.utils` is a decorator which can be used with `QgsMapLayer` fixtures
+  to ensure that they are cleaned properly if they are used but not added to the `QgsProject`. This is only needed with
+  layers with other than memory provider.
    ```python
    # conftest.py of start of a test file
    import pytest
@@ -60,7 +64,6 @@ markers can be used.
      return QgsVectorLayer("layer_file.geojson", "some layer")
 
    ```
-
 
 ### Hooks
 
