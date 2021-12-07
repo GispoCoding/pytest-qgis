@@ -214,13 +214,7 @@ def qgis_world_map_geopackage(tmp_path: Path) -> Path:
     * disputed_borders
     * states_provinces
     """
-    world_map_gpkg = Path(
-        QgsApplication.pkgDataPath(), "resources", "data", "world_map.gpkg"
-    )
-    assert world_map_gpkg.exists(), world_map_gpkg
-    # Copy the geopackage to allow modifications
-    path_to_copied_geopackage = Path(shutil.copy(world_map_gpkg, tmp_path))
-    return path_to_copied_geopackage
+    return _get_world_map_geopackage(tmp_path)
 
 
 @pytest.fixture()
@@ -229,14 +223,7 @@ def qgis_countries_layer(qgis_world_map_geopackage: Path) -> QgsVectorLayer:
     """
     Natural Earth countries as a QgsVectorLayer.
     """
-
-    ne_countries = QgsVectorLayer(
-        f"{qgis_world_map_geopackage}|layername=countries",
-        "Natural Earth Countries",
-        "ogr",
-    )
-    assert ne_countries.isValid(), qgis_world_map_geopackage
-    return ne_countries
+    return _get_countries_layer(qgis_world_map_geopackage)
 
 
 @pytest.fixture(autouse=True)
@@ -244,7 +231,6 @@ def qgis_show_map(
     qgis_app: QgsApplication,
     qgis_iface: QgisInterface,
     qgis_parent: QWidget,
-    qgis_countries_layer: QgsVectorLayer,
     tmp_path: Path,
     request: "SubRequest",
 ) -> None:
@@ -270,7 +256,6 @@ def qgis_show_map(
             qgis_parent,
             _parse_show_map_marker(show_map_marker),
             tmp_path,
-            qgis_countries_layer,
         )
 
 
@@ -334,7 +319,6 @@ def _configure_qgis_map(
     qgis_parent: QWidget,
     settings: ShowMapSettings,
     tmp_path: Path,
-    qgis_countries_layer: QgsVectorLayer,
 ) -> None:
     message_box = QMessageBox(qgis_parent)
     try:
@@ -356,10 +340,11 @@ def _configure_qgis_map(
 
         if settings.add_basemap:
             # Add Natural Earth Countries
-            QgsProject.instance().addMapLayer(qgis_countries_layer)
-            if qgis_countries_layer.crs() != QgsProject.instance().crs():
+            countries_layer = _get_countries_layer(_get_world_map_geopackage(tmp_path))
+            QgsProject.instance().addMapLayer(countries_layer)
+            if countries_layer.crs() != QgsProject.instance().crs():
                 _initialize_processing(qgis_app)
-                replace_layers_with_reprojected_clones([qgis_countries_layer], tmp_path)
+                replace_layers_with_reprojected_clones([countries_layer], tmp_path)
 
         QgsProject.instance().reloadAllLayers()
         qgis_iface.mapCanvas().refreshAllLayers()
@@ -450,3 +435,25 @@ def _parse_show_map_marker(marker: "Mark") -> ShowMapSettings:
     elif not isinstance(extent, QgsRectangle):
         raise TypeError("Extent has to be of type QgsRectangle")
     return ShowMapSettings(timeout, add_basemap, zoom_to_common_extent, extent)
+
+
+def _get_world_map_geopackage(tmp_path: Path) -> Path:
+    """Copy geopackage to the temporary directory and return the copy."""
+    world_map_gpkg = Path(
+        QgsApplication.pkgDataPath(), "resources", "data", "world_map.gpkg"
+    )
+    assert world_map_gpkg.exists(), world_map_gpkg
+
+    # Copy the geopackage to allow modifications
+    path_to_copied_geopackage = Path(shutil.copy(world_map_gpkg, tmp_path))
+    return path_to_copied_geopackage
+
+
+def _get_countries_layer(geopackage: Path) -> QgsVectorLayer:
+    countries_layer = QgsVectorLayer(
+        f"{geopackage}|layername=countries",
+        "Natural Earth Countries",
+        "ogr",
+    )
+    assert countries_layer.isValid(), geopackage
+    return countries_layer
