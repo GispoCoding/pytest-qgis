@@ -40,7 +40,7 @@ def replace_iface_with_qgis_iface(qgis_iface):
 @pytest.mark.usefixtures("replace_iface_with_qgis_iface")
 def test_a_teardown():
     """
-    When replacing importer or passed QgisInterface inside a fixture,
+    When replacing imported or passed QgisInterface inside a fixture,
     it might cause problems with pytest_qgis.qgis_interface.removeAllLayers
     when qgis_app is exiting.
     """
@@ -92,6 +92,17 @@ def test_processing_run(qgis_processing):
 )
 def test_setup_qgis_iface(qgis_iface):
     assert iface == qgis_iface
+
+
+def test_iface_active_layer(qgis_iface, layer_polygon, layer_points):
+    QgsProject.instance().addMapLayer(layer_polygon)
+    QgsProject.instance().addMapLayer(layer_points)
+
+    assert qgis_iface.activeLayer() is None
+    qgis_iface.setActiveLayer(layer_polygon)
+    assert qgis_iface.activeLayer() == layer_polygon
+    qgis_iface.setActiveLayer(layer_points)
+    assert qgis_iface.activeLayer() == layer_points
 
 
 def test_ini_canvas(testdir: "Testdir"):
