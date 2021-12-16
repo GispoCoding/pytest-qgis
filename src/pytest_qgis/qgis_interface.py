@@ -27,7 +27,7 @@ __copyright__ = (
 )
 
 import logging
-from typing import List
+from typing import List, Optional
 
 import sip
 from qgis.core import (
@@ -66,6 +66,7 @@ class QgisInterface(QObject):
         self.canvas = canvas
         self._messageBar = messageBar
         self._mainWindow = mainWindow
+        self._active_layer_id: Optional[str] = None
 
         # Set up slots so we can mimic the behaviour of QGIS when layers
         # are added.
@@ -168,12 +169,13 @@ class QgisInterface(QObject):
         """
         pass
 
-    def activeLayer(self) -> QgsMapLayer:
+    def activeLayer(self) -> Optional[QgsMapLayer]:
         """Get pointer to the active layer (layer selected in the legend)."""
-        # noinspection PyArgumentList
-        layers = QgsProject.instance().mapLayers()
-        for item in layers:
-            return layers[item]
+        return (
+            QgsProject.instance().mapLayer(self._active_layer_id)
+            if self._active_layer_id
+            else None
+        )
 
     def addPluginToMenu(self, name: str, action: QAction) -> None:
         """Add plugin item to menu.
@@ -249,4 +251,4 @@ class QgisInterface(QObject):
         """
         Set the active layer (layer gets selected in the legend)
         """
-        pass
+        self._active_layer_id = layer.id()
