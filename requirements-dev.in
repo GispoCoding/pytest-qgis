@@ -7,6 +7,7 @@ wheel
 
 # testing
 pytest-cov
+pytest-qt==3.3.0
 
 # for linting checks at commit time
 pre-commit

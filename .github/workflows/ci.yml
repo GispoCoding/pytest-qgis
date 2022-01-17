@@ -20,8 +20,8 @@ jobs:
     # Runs all tests
       - name: Run tests
         run: >
-          docker run --rm --net=host --volume `pwd`:/app -w=/app -e QGIS_PLUGIN_IN_CI=1 qgis/qgis:${{ matrix.docker_tags }} sh -c
-          "pip3 install -qr requirements.txt && pip3 install -e . && xvfb-run -s '+extension GLX -screen 0 1024x768x24'
+          docker run --rm --net=host --volume `pwd`:/app -w=/app qgis/qgis:${{ matrix.docker_tags }} sh -c
+          "pip3 install -qr requirements.txt pytest-qt==3.3.0 && pip3 install -e . && xvfb-run -s '+extension GLX -screen 0 1024x768x24'
           pytest -v"
 
   code-style:

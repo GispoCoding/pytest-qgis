@@ -22,8 +22,8 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
 * `qgis_canvas` returns [`QgsMapCanvas`](https://qgis.org/pyqgis/master/gui/QgsMapCanvas.html).
 * `qgis_parent` returns the QWidget used as parent of the `qgis_canvas`
 * `qgis_iface` returns stubbed [`QgsInterface`](https://qgis.org/pyqgis/master/gui/QgisInterface.html)
-* `qgis_new_project` makes sure that all the map layers and configurations are removed. This should be used with tests that
-  add stuff to [`QgsProject`](https://qgis.org/pyqgis/master/core/QgsProject.html).
+* `qgis_new_project` makes sure that all the map layers and configurations are removed. This should be used with tests
+  that add stuff to [`QgsProject`](https://qgis.org/pyqgis/master/core/QgsProject.html).
 * `qgis_processing` initializes the processing framework. This can be used when testing code that
   calls `processing.run(...)`.
 * `qgis_version` returns QGIS version number as integer.
@@ -65,6 +65,9 @@ markers can be used.
      return QgsVectorLayer("layer_file.geojson", "some layer")
 
    ```
+
+* `get_qgs_attribute_dialog_widgets_by_name` function can be used to get dictionary of the `QgsAttributeDialog` widgets.
+  Check the test [test_qgis_ui.py::test_attribute_dialog_change](./tests/visual/test_qgis_ui.py) for a usage example.
 
 ### Hooks
 
