@@ -1,3 +1,9 @@
+# Version: 1.2.0 (17-01-2022)
+
+* [#10](https://github.com/GispoCoding/pytest-qgis/pull/10): Allow showing attribute dialog
+* [#9](https://github.com/GispoCoding/pytest-qgis/pull/9): Use QgsLayerTreeMapCanvasBridge to keep the layer order correct
+
+
 # Version: 1.1.2 (12-16-2021)
 
 * [#8](https://github.com/GispoCoding/pytest-qgis/pull/8): Add stub iface.activeLayer logic
