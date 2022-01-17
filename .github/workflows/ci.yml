@@ -17,12 +17,23 @@ jobs:
       - uses: actions/checkout@v2
       - name: Pull QGIS ${{ matrix.docker_tags }}
         run: docker pull qgis/qgis:${{ matrix.docker_tags }}
-    # Runs all tests
+      # Runs all tests
       - name: Run tests
         run: >
-          docker run --rm --net=host --volume `pwd`:/app -w=/app qgis/qgis:${{ matrix.docker_tags }} sh -c
-          "pip3 install -qr requirements.txt pytest-qt==3.3.0 && pip3 install -e . && xvfb-run -s '+extension GLX -screen 0 1024x768x24'
-          pytest -v"
+          docker run --rm --net=host -e QGIS_IN_CI=1 --volume `pwd`:/app -w=/app qgis/qgis:${{ matrix.docker_tags }} sh -c
+          "pip3 install -qr requirements.txt pytest-cov pytest-qt==3.3.0 && pip3 install -e . && xvfb-run -s '+extension GLX -screen 0 1024x768x24'
+          pytest -v --cov src/pytest_qgis --cov-report=xml"
+
+      # Upload coverage report. Will not work if the repo is private
+      - name: Upload coverage to Codecov
+        if: ${{ matrix.docker_tags == 'latest' && !github.event.repository.private }}
+        uses: codecov/codecov-action@v2
+        with:
+          file: ./coverage.xml
+          flags: pytest
+          fail_ci_if_error: false # set to true when upload is working
+          verbose: false
+
 
   code-style:
     runs-on: ubuntu-latest
