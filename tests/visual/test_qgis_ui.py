@@ -23,7 +23,9 @@ from qgis.PyQt.QtCore import QCoreApplication
 
 from pytest_qgis.utils import get_qgs_attribute_dialog_widgets_by_name
 
-TIMEOUT = 1
+from ..utils import IN_CI
+
+TIMEOUT = 0.01 if IN_CI else 1
 
 
 def test_attribute_dialog_change(qgis_iface, qgis_canvas, layer_points, qtbot):

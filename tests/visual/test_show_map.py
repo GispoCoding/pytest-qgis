@@ -19,13 +19,13 @@
 import pytest
 from qgis.core import QgsProject, QgsRectangle
 
-from ..utils import QGIS_VERSION
+from ..utils import IN_CI, QGIS_VERSION
 
 """
 These tests are meant to be tested visually by the developer.
 """
 
-DEFAULT_TIMEOUT = 1
+DEFAULT_TIMEOUT = 0.01 if IN_CI else 1
 
 
 @pytest.fixture(autouse=True)
