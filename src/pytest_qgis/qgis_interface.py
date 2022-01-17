@@ -42,6 +42,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 from qgis.PyQt.QtWidgets import QAction, QDockWidget, QWidget
 from qgis.PyQt.QtWidgets import QMainWindow
 from qgis.PyQt.QtWidgets import QMenuBar
+from qgis.PyQt.QtWidgets import QToolBar
 from pytest_qgis.mock_qgis_classes import MockMessageBar
 
 LOGGER = logging.getLogger("QGIS")
@@ -84,6 +85,9 @@ class QgisInterface(QObject):
         # Add the MenuBar
         menu_bar = QMenuBar()
         self._mainWindow.setMenuBar(menu_bar)
+
+        # Add the toolbar list
+        self._toolbars = list()
 
     @pyqtSlot("QList<QgsMapLayer*>")
     def addLayers(self, layers: List[QgsMapLayer]) -> None:
@@ -209,13 +213,15 @@ class QgisInterface(QObject):
         """
         pass
 
-    def addToolBar(self, name: str) -> None:
+    def addToolBar(self, name: str) -> QToolBar:
         """Add toolbar with specified name.
 
         :param name: Name for the toolbar.
         :type name: str
         """
-        pass
+        toolbar = QToolBar(self._mainWindow)
+        self._toolbars.append(toolbar)
+        return toolbar
 
     def mapCanvas(self) -> QgsMapCanvas:
         """Return a pointer to the map canvas."""
