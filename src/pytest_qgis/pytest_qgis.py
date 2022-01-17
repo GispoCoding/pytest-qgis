@@ -33,7 +33,7 @@ import pytest
 from _pytest.tmpdir import TempPathFactory
 from qgis.core import Qgis, QgsApplication, QgsProject, QgsRectangle, QgsVectorLayer
 from qgis.gui import QgisInterface as QgisInterfaceOrig
-from qgis.gui import QgsGui, QgsMapCanvas
+from qgis.gui import QgsGui, QgsLayerTreeMapCanvasBridge, QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtWidgets import QMessageBox, QWidget
@@ -322,6 +322,9 @@ def _configure_qgis_map(
     tmp_path: Path,
 ) -> None:
     message_box = QMessageBox(qgis_parent)
+    bridge = QgsLayerTreeMapCanvasBridge(  # noqa: F841, this needs to be assigned
+        QgsProject.instance().layerTreeRoot(), qgis_iface.mapCanvas()
+    )
     try:
         # Change project CRS to most common CRS if it is not set
         if not QgsProject.instance().crs().isValid():

@@ -32,8 +32,7 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
 
 ### Markers
 
-* `qgis_show_map` lets developer inspect the QGIS map visually at the teardown of the test.  **NOTE**: This marker is
-  still experimental and layer order might differ if using layers with different coordinate systems. Full signature of
+* `qgis_show_map` lets developer inspect the QGIS map visually at the teardown of the test. Full signature of
   the marker is:
   ```python
   @pytest.mark.qgis_show_map(timeout: int = 30, add_basemap: bool = False, zoom_to_common_extent: bool = True, extent: QgsRectangle = None)

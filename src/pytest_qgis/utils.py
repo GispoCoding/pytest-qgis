@@ -171,8 +171,6 @@ def copy_layer_style_and_position(
         layer_tree_layer.name()
     ]
 
-    # TODO: it does not seem to matter how this is used.
-    #  All new layers appear at he bottom...
     group.insertLayer(index + 1, layer2)
 
 

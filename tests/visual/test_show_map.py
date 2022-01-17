@@ -61,6 +61,19 @@ def test_show_map_crs_change_to_3067(
     QgsProject.instance().addMapLayers([layer_polygon, layer_polygon_3067, raster_3067])
 
 
+@pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT)
+@pytest.mark.skipif(
+    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+)
+def test_show_map_crs_change_to_3067_with_different_layer_order(
+    layer_polygon, layer_polygon_3067, raster_3067, qgis_version
+):
+    layer_polygon_3067.setOpacity(0.3)
+    if qgis_version > 31800:
+        raster_3067.setOpacity(0.9)
+    QgsProject.instance().addMapLayers([raster_3067, layer_polygon_3067, layer_polygon])
+
+
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT, add_basemap=True)
 @pytest.mark.skipif(
     QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
@@ -83,7 +96,7 @@ def test_show_map_crs_change_to_4326(
 ):
     if qgis_version > 31800:
         raster_3067.setOpacity(0.9)
-    QgsProject.instance().addMapLayers([layer_points, raster_3067, layer_polygon])
+    QgsProject.instance().addMapLayers([layer_points, layer_polygon, raster_3067])
 
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT)
