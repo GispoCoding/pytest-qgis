@@ -19,11 +19,13 @@
 import pytest
 import sip
 from qgis.core import QgsCoordinateReferenceSystem, QgsProject, QgsVectorLayer
+from qgis.gui import QgsAttributeDialog
 
 from pytest_qgis.utils import (
     clean_qgis_layer,
     get_common_extent_from_all_layers,
     get_layers_with_different_crs,
+    get_qgs_attribute_dialog_widgets_by_name,
     replace_layers_with_reprojected_clones,
     set_map_crs_based_on_layers,
 )
@@ -114,3 +116,24 @@ def test_clean_qgis_layer(layer_polygon):
     list(layer_function())
 
     assert sip.isdeleted(layer)
+
+
+def test_get_qgs_attribute_dialog_widgets_by_name(qgis_iface, layer_points):
+    dialog = QgsAttributeDialog(
+        layer_points,
+        layer_points.getFeature(1),
+        False,
+        qgis_iface.mainWindow(),
+        True,
+    )
+    widgets_by_name = get_qgs_attribute_dialog_widgets_by_name(dialog)
+    assert {
+        name: widget.__class__.__name__ for name, widget in widgets_by_name.items()
+    } == {
+        "bool_field": "QCheckBox",
+        "date_field": "QDateTimeEdit",
+        "datetime_field": "QDateTimeEdit",
+        "decimal_field": "QgsFilterLineEdit",
+        "fid": "QgsFilterLineEdit",
+        "text_field": "QgsFilterLineEdit",
+    }

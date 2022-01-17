@@ -19,7 +19,7 @@
 import pytest
 from qgis.core import QgsProject, QgsRectangle
 
-from .utils import QGIS_VERSION
+from ..utils import QGIS_VERSION
 
 """
 These tests are meant to be tested visually by the developer.

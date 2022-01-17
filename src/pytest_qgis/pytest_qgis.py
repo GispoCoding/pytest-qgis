@@ -33,7 +33,7 @@ import pytest
 from _pytest.tmpdir import TempPathFactory
 from qgis.core import Qgis, QgsApplication, QgsProject, QgsRectangle, QgsVectorLayer
 from qgis.gui import QgisInterface as QgisInterfaceOrig
-from qgis.gui import QgsMapCanvas
+from qgis.gui import QgsGui, QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtWidgets import QMessageBox, QWidget
@@ -271,6 +271,7 @@ def _start_and_configure_qgis_app(config: "Config") -> None:
     if not settings.qgis_init_disabled:
         _APP = QgsApplication([], GUIenabled=settings.gui_enabled)
         _APP.initQgis()
+        QgsGui.editorWidgetRegistry().initEditors()
     _PARENT = QWidget()
     _CANVAS = QgsMapCanvas(_PARENT)
     _CANVAS.resize(QtCore.QSize(settings.canvas_width, settings.canvas_height))
