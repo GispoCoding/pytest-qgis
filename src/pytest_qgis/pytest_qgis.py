@@ -37,6 +37,7 @@ from qgis.gui import QgsGui, QgsLayerTreeMapCanvasBridge, QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtWidgets import QMessageBox, QWidget
+from qgis.PyQt.QtWidgets import QMainWindow
 
 from pytest_qgis.mock_qgis_classes import MockMessageBar
 from pytest_qgis.qgis_interface import QgisInterface
@@ -272,7 +273,7 @@ def _start_and_configure_qgis_app(config: "Config") -> None:
         _APP = QgsApplication([], GUIenabled=settings.gui_enabled)
         _APP.initQgis()
         QgsGui.editorWidgetRegistry().initEditors()
-    _PARENT = QWidget()
+    _PARENT = QMainWindow()
     _CANVAS = QgsMapCanvas(_PARENT)
     _CANVAS.resize(QtCore.QSize(settings.canvas_width, settings.canvas_height))
 

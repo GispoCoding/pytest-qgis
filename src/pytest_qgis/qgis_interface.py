@@ -40,7 +40,8 @@ from qgis.core import (
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 from qgis.PyQt.QtWidgets import QAction, QDockWidget, QWidget
-
+from qgis.PyQt.QtWidgets import QMainWindow
+from qgis.PyQt.QtWidgets import QMenuBar
 from pytest_qgis.mock_qgis_classes import MockMessageBar
 
 LOGGER = logging.getLogger("QGIS")
@@ -57,7 +58,7 @@ class QgisInterface(QObject):
     currentLayerChanged = pyqtSignal(QgsMapCanvas)  # noqa N802
 
     def __init__(
-        self, canvas: QgsMapCanvas, messageBar: MockMessageBar, mainWindow: QWidget
+        self, canvas: QgsMapCanvas, messageBar: MockMessageBar, mainWindow: QMainWindow
     ) -> None:
         """Constructor
         :param canvas:
@@ -79,6 +80,10 @@ class QgisInterface(QObject):
         # For processing module
         self.destCrs = None
         self._layers: List[QgsMapLayer] = []
+
+        # Add the MenuBar
+        menu_bar = QMenuBar()
+        self._mainWindow.setMenuBar(menu_bar)
 
     @pyqtSlot("QList<QgsMapLayer*>")
     def addLayers(self, layers: List[QgsMapLayer]) -> None:
