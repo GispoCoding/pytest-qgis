@@ -228,19 +228,19 @@ def qgis_countries_layer(qgis_world_map_geopackage: Path) -> QgsVectorLayer:
 
 
 @pytest.fixture()
-def qgis_bot() -> QgisBot:
+def qgis_bot(qgis_iface: QgisInterface) -> QgisBot:
     """
     Object that holds common utility methods for interacting with QGIS.
     """
-    return QgisBot()
+    return QgisBot(qgis_iface)
 
 
 @pytest.fixture(scope="module")
-def module_qgis_bot() -> QgisBot:
+def module_qgis_bot(qgis_iface: QgisInterface) -> QgisBot:
     """
     Object that holds common utility methods for interacting with QGIS.
     """
-    return QgisBot()
+    return QgisBot(qgis_iface)
 
 
 @pytest.fixture(autouse=True)

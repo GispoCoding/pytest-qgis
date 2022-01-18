@@ -25,7 +25,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsVectorLayerUtils,
 )
-from qgis.gui import QgsAttributeDialog, QgsAttributeEditorContext
+from qgis.gui import QgisInterface, QgsAttributeDialog, QgsAttributeEditorContext
 from qgis.PyQt.QtWidgets import QLabel, QWidget
 
 
@@ -34,11 +34,11 @@ class QgisBot:
     Class to hold common utility methods for interacting with QIGS.
     """
 
-    def __init__(self) -> None:
-        # Import has to be here (or in each method needing iface),
-        # because iface is not automatically injected
-        # since this module is imported in conftest
-        from qgis.utils import iface
+    def __init__(  # noqa: QGS105 # Iface has to be passed in order to
+        # ensure compatibility with all QGIS versions >= 3.10
+        self,
+        iface: QgisInterface,
+    ) -> None:
 
         self._iface = iface
 
