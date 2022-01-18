@@ -43,11 +43,11 @@ jobs:
       - uses: actions/setup-python@v2
       - uses: pre-commit/action@v2.0.2
 
-  changelog:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run Changelog CI
-        uses: saadmk11/changelog-ci@v1.0.0
-        with:
-          config_file: changelog-ci-config.json
+#  changelog:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Run Changelog CI
+#        uses: saadmk11/changelog-ci@v1.0.0
+#        with:
+#          config_file: changelog-ci-config.json
