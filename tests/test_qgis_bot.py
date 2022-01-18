@@ -16,16 +16,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 #
+import pytest
 from qgis.core import QgsGeometry
 from qgis.gui import QgsAttributeDialog
 
 
-def test_create_feature_with_attribute_dialog(layer_points, qgis_bot):
+@pytest.mark.parametrize("bot", ["qgis_bot", "module_qgis_bot"])
+def test_create_feature_with_attribute_dialog(layer_points, bot, request):
+    bot = request.getfixturevalue(bot)
     layer = layer_points
     count = layer.featureCount()
 
     layer.startEditing()
-    feat = qgis_bot.create_feature_with_attribute_dialog(
+    feat = bot.create_feature_with_attribute_dialog(
         layer, QgsGeometry.fromWkt("POINT(0,0)")
     )
     assert layer.featureCount() == count + 1

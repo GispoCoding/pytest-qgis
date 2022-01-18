@@ -235,6 +235,14 @@ def qgis_bot() -> QgisBot:
     return QgisBot()
 
 
+@pytest.fixture(scope="module")
+def module_qgis_bot() -> QgisBot:
+    """
+    Object that holds common utility methods for interacting with QGIS.
+    """
+    return QgisBot()
+
+
 @pytest.fixture(autouse=True)
 def qgis_show_map(
     qgis_app: QgsApplication,
