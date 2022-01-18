@@ -16,7 +16,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 #
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from qgis.core import (
     QgsFeature,
@@ -26,6 +26,7 @@ from qgis.core import (
     QgsVectorLayerUtils,
 )
 from qgis.gui import QgsAttributeDialog, QgsAttributeEditorContext
+from qgis.PyQt.QtWidgets import QLabel, QWidget
 
 
 class QgisBot:
@@ -93,3 +94,28 @@ class QgisBot:
 
         assert feature_id, "Creating new feature failed"
         return layer.getFeature(feature_id[0])
+
+    @staticmethod
+    def get_qgs_attribute_dialog_widgets_by_name(
+        widget: Union[QgsAttributeDialog, QWidget]
+    ) -> Dict[str, QWidget]:
+        """
+        Gets recursively all attribute dialog widgets by name.
+        :param widget: QgsAttributeDialog for the first time, afterwards QWidget.
+        :return: Dictionary with field names as keys and corresponding
+        QWidgets as values.
+        """
+        widgets_by_name = {}
+        for child in widget.children():
+            if isinstance(child, QLabel):
+                if child.text() != "" and child.toolTip() != "":
+                    related_widget = child.buddy()
+                    if related_widget is not None:
+                        widgets_by_name[child.text()] = child.buddy()
+            if hasattr(child, "children"):
+                widgets_by_name = {
+                    **widgets_by_name,
+                    **QgisBot.get_qgs_attribute_dialog_widgets_by_name(child),
+                }
+
+        return widgets_by_name

@@ -21,14 +21,14 @@ from qgis.gui import QgsAttributeDialog
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import QCoreApplication
 
-from pytest_qgis.utils import get_qgs_attribute_dialog_widgets_by_name
-
 from ..utils import IN_CI
 
 TIMEOUT = 0.01 if IN_CI else 1
 
 
-def test_attribute_dialog_change(qgis_iface, qgis_canvas, layer_points, qtbot):
+def test_attribute_dialog_change(
+    qgis_iface, qgis_canvas, layer_points, qgis_bot, qtbot
+):
     # The essential thing is QgsGui.editorWidgetRegistry().initEditors()
     layer = layer_points
 
@@ -46,7 +46,7 @@ def test_attribute_dialog_change(qgis_iface, qgis_canvas, layer_points, qtbot):
     qtbot.add_widget(dialog)
     dialog.show()
 
-    widgets_by_name = get_qgs_attribute_dialog_widgets_by_name(dialog)
+    widgets_by_name = qgis_bot.get_qgs_attribute_dialog_widgets_by_name(dialog)
     test_text = "New string"
 
     # Doubleclick and keys after that erase the old text

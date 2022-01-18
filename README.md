@@ -67,9 +67,6 @@ markers can be used.
 
    ```
 
-* `get_qgs_attribute_dialog_widgets_by_name` function can be used to get dictionary of the `QgsAttributeDialog` widgets.
-  Check the test [test_qgis_ui.py::test_attribute_dialog_change](./tests/visual/test_qgis_ui.py) for a usage example.
-
 ### Hooks
 
 * `pytest_configure` hook is used to initialize and
@@ -95,6 +92,8 @@ Class to hold common utility methods for interacting with QGIS. Here are some of
 
 * `create_feature_with_attribute_dialog` method to create a feature with default values using QgsAttributeDialog. This
   ensures that all the default values are honored and for example boolean fields are either true or false, not null.
+* `get_qgs_attribute_dialog_widgets_by_name` function can be used to get dictionary of the `QgsAttributeDialog` widgets.
+  Check the test [test_qgis_ui.py::test_attribute_dialog_change](./tests/visual/test_qgis_ui.py) for a usage example.
 
 ## Requirements
 

@@ -17,6 +17,7 @@
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 #
 from qgis.core import QgsGeometry
+from qgis.gui import QgsAttributeDialog
 
 
 def test_create_feature_with_attribute_dialog(layer_points, qgis_bot):
@@ -29,3 +30,24 @@ def test_create_feature_with_attribute_dialog(layer_points, qgis_bot):
     )
     assert layer.featureCount() == count + 1
     assert feat["bool_field"] is False  # With normal way of creating, it would be NULL.
+
+
+def test_get_qgs_attribute_dialog_widgets_by_name(qgis_iface, layer_points, qgis_bot):
+    dialog = QgsAttributeDialog(
+        layer_points,
+        layer_points.getFeature(1),
+        False,
+        qgis_iface.mainWindow(),
+        True,
+    )
+    widgets_by_name = qgis_bot.get_qgs_attribute_dialog_widgets_by_name(dialog)
+    assert {
+        name: widget.__class__.__name__ for name, widget in widgets_by_name.items()
+    } == {
+        "bool_field": "QCheckBox",
+        "date_field": "QDateTimeEdit",
+        "datetime_field": "QDateTimeEdit",
+        "decimal_field": "QgsFilterLineEdit",
+        "fid": "QgsFilterLineEdit",
+        "text_field": "QgsFilterLineEdit",
+    }
