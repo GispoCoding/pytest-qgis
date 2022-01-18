@@ -219,7 +219,7 @@ class QgisInterface(QObject):
         :param name: Name for the toolbar.
         :type name: str
         """
-        toolbar = QToolBar(self._mainWindow)
+        toolbar = QToolBar(name, parent=self._mainWindow)
         self._toolbars.append(toolbar)
         return toolbar
 
