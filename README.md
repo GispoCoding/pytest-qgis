@@ -20,6 +20,7 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
 * `qgis_app` returns and eventually exits fully
   configured [`QgsApplication`](https://qgis.org/pyqgis/master/core/QgsApplication.html). This fixture is called
   automatically on the start of pytest session.
+* `qgis_bot` returns a [`QgisBot`](#qgisbot), which holds common utility methods for interacting with QGIS.
 * `qgis_canvas` returns [`QgsMapCanvas`](https://qgis.org/pyqgis/master/gui/QgsMapCanvas.html).
 * `qgis_parent` returns the QWidget used as parent of the `qgis_canvas`
 * `qgis_iface` returns stubbed [`QgsInterface`](https://qgis.org/pyqgis/master/gui/QgisInterface.html)
@@ -33,8 +34,8 @@ This plugin makes it easier to write QGIS plugin tests with the help of some fix
 
 ### Markers
 
-* `qgis_show_map` lets developer inspect the QGIS map visually at the teardown of the test. Full signature of
-  the marker is:
+* `qgis_show_map` lets developer inspect the QGIS map visually at the teardown of the test. Full signature of the marker
+  is:
   ```python
   @pytest.mark.qgis_show_map(timeout: int = 30, add_basemap: bool = False, zoom_to_common_extent: bool = True, extent: QgsRectangle = None)
   ```
@@ -87,6 +88,13 @@ markers can be used.
   option `--qgis_disable_gui` will override this.
 * `qgis_canvas_width` width of the QGIS canvas in pixels. Defaults to 600.
 * `qgis_canvas_height` height of the QGIS canvas in pixels. Defaults to 600.
+
+## QgisBot
+
+Class to hold common utility methods for interacting with QGIS. Here are some of the methods:
+
+* `create_feature_with_attribute_dialog` method to create a feature with default values using QgsAttributeDialog. This
+  ensures that all the default values are honored and for example boolean fields are either true or false, not null.
 
 ## Requirements
 
