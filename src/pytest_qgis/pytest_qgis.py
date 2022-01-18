@@ -39,6 +39,7 @@ from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtWidgets import QMainWindow, QMessageBox, QWidget
 
 from pytest_qgis.mock_qgis_classes import MockMessageBar
+from pytest_qgis.qgis_bot import QgisBot
 from pytest_qgis.qgis_interface import QgisInterface
 from pytest_qgis.utils import (
     clean_qgis_layer,
@@ -224,6 +225,22 @@ def qgis_countries_layer(qgis_world_map_geopackage: Path) -> QgsVectorLayer:
     Natural Earth countries as a QgsVectorLayer.
     """
     return _get_countries_layer(qgis_world_map_geopackage)
+
+
+@pytest.fixture()
+def qgis_bot(qgis_iface: QgisInterface) -> QgisBot:
+    """
+    Object that holds common utility methods for interacting with QGIS.
+    """
+    return QgisBot(qgis_iface)
+
+
+@pytest.fixture(scope="module")
+def module_qgis_bot(qgis_iface: QgisInterface) -> QgisBot:
+    """
+    Object that holds common utility methods for interacting with QGIS.
+    """
+    return QgisBot(qgis_iface)
 
 
 @pytest.fixture(autouse=True)

@@ -15,48 +15,42 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
-import time
-
+#
+import pytest
+from qgis.core import QgsGeometry
 from qgis.gui import QgsAttributeDialog
-from qgis.PyQt import QtCore
-from qgis.PyQt.QtCore import QCoreApplication
-
-from ..utils import IN_CI
-
-TIMEOUT = 0.01 if IN_CI else 1
 
 
-def test_attribute_dialog_change(
-    qgis_iface, qgis_canvas, layer_points, qgis_bot, qtbot
-):
-    # The essential thing is QgsGui.editorWidgetRegistry().initEditors()
+@pytest.mark.parametrize("bot", ["qgis_bot", "module_qgis_bot"])
+def test_create_feature_with_attribute_dialog(layer_points, bot, request):
+    bot = request.getfixturevalue(bot)
     layer = layer_points
+    count = layer.featureCount()
 
     layer.startEditing()
-    f = layer.getFeature(1)
-    assert f
+    feat = bot.create_feature_with_attribute_dialog(
+        layer, QgsGeometry.fromWkt("POINT(0,0)")
+    )
+    assert layer.featureCount() == count + 1
+    assert feat["bool_field"] is False  # With normal way of creating, it would be NULL.
 
+
+def test_get_qgs_attribute_dialog_widgets_by_name(qgis_iface, layer_points, qgis_bot):
     dialog = QgsAttributeDialog(
-        layer,
-        f,
+        layer_points,
+        layer_points.getFeature(1),
         False,
         qgis_iface.mainWindow(),
         True,
     )
-    qtbot.add_widget(dialog)
-    dialog.show()
-
     widgets_by_name = qgis_bot.get_qgs_attribute_dialog_widgets_by_name(dialog)
-    test_text = "New string"
-
-    # Doubleclick and keys after that erase the old text
-    qtbot.mouseDClick(widgets_by_name["text_field"], QtCore.Qt.LeftButton)
-    qtbot.keyClicks(widgets_by_name["text_field"], test_text)
-
-    t = time.time()
-    while time.time() - t < TIMEOUT and dialog.isVisible():
-        QCoreApplication.processEvents()
-    dialog.accept()
-    layer.commitChanges()
-
-    assert layer.getFeature(1)["text_field"] == test_text
+    assert {
+        name: widget.__class__.__name__ for name, widget in widgets_by_name.items()
+    } == {
+        "bool_field": "QCheckBox",
+        "date_field": "QDateTimeEdit",
+        "datetime_field": "QDateTimeEdit",
+        "decimal_field": "QgsFilterLineEdit",
+        "fid": "QgsFilterLineEdit",
+        "text_field": "QgsFilterLineEdit",
+    }
