@@ -220,7 +220,7 @@ class QgisInterface(QObject):
         :type name: str
         """
         toolbar = QToolBar(name, parent=self._mainWindow)
-        self._toolbars.append(toolbar)
+        self._toolbars[name] = toolbar
         return toolbar
 
     def mapCanvas(self) -> QgsMapCanvas:
