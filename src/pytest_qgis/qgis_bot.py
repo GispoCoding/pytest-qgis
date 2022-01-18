@@ -87,7 +87,6 @@ class QgisBot:
         # Two accepts to bypass some warnings
         dialog.accept()
         dialog.accept()
-        layer.commitChanges()
 
         feature_ids = set(layer.allFeatureIds())
         feature_id = list(feature_ids.difference(initial_ids))
