@@ -36,8 +36,7 @@ from qgis.gui import QgisInterface as QgisInterfaceOrig
 from qgis.gui import QgsGui, QgsLayerTreeMapCanvasBridge, QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.QtCore import QCoreApplication
-from qgis.PyQt.QtWidgets import QMessageBox, QWidget
-from qgis.PyQt.QtWidgets import QMainWindow
+from qgis.PyQt.QtWidgets import QMainWindow, QMessageBox, QWidget
 
 from pytest_qgis.mock_qgis_classes import MockMessageBar
 from pytest_qgis.qgis_interface import QgisInterface

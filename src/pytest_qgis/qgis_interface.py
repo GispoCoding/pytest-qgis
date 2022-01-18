@@ -27,7 +27,7 @@ __copyright__ = (
 )
 
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import sip
 from qgis.core import (
@@ -39,10 +39,15 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
-from qgis.PyQt.QtWidgets import QAction, QDockWidget, QWidget
-from qgis.PyQt.QtWidgets import QMainWindow
-from qgis.PyQt.QtWidgets import QMenuBar
-from qgis.PyQt.QtWidgets import QToolBar
+from qgis.PyQt.QtWidgets import (
+    QAction,
+    QDockWidget,
+    QMainWindow,
+    QMenuBar,
+    QToolBar,
+    QWidget,
+)
+
 from pytest_qgis.mock_qgis_classes import MockMessageBar
 
 LOGGER = logging.getLogger("QGIS")
