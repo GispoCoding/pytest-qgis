@@ -87,7 +87,7 @@ class QgisInterface(QObject):
         self._mainWindow.setMenuBar(menu_bar)
 
         # Add the toolbar list
-        self._toolbars = list()
+        self._toolbars: Dict[str, QToolBar] = {}
 
     @pyqtSlot("QList<QgsMapLayer*>")
     def addLayers(self, layers: List[QgsMapLayer]) -> None:
