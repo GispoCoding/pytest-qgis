@@ -19,12 +19,13 @@ from typing import TYPE_CHECKING
 
 import pytest
 from qgis.core import Qgis, QgsProcessing, QgsProject, QgsVectorLayer
+from qgis.PyQt.QtWidgets import QToolBar
 from qgis.utils import iface
 
 from .utils import QGIS_VERSION
 
 if TYPE_CHECKING:
-    from _pytest.pytester import Testdir
+    pass
 
 # DO not use this directly, this is only meant to be used with
 # replace_iface_with_qgis_iface fixtrure
@@ -105,47 +106,8 @@ def test_iface_active_layer(qgis_iface, layer_polygon, layer_points):
     assert qgis_iface.activeLayer() == layer_points
 
 
-def test_ini_canvas(testdir: "Testdir"):
-    testdir.makeini(
-        """
-        [pytest]
-        qgis_canvas_height=1000
-        qgis_canvas_width=1200
-    """
-    )
-    testdir.makepyfile(
-        """
-        def test_canvas(qgis_canvas):
-            assert qgis_canvas.width() == 1200
-            assert qgis_canvas.height() == 1000
-    """
-    )
-    result = testdir.runpytest("--qgis_disable_init")
-    result.assert_outcomes(passed=1)
-
-
-@pytest.mark.parametrize("gui_enabled", [True, False])
-def test_ini_gui(gui_enabled: bool, testdir: "Testdir"):
-    testdir.makeini(
-        f"""
-        [pytest]
-        qgis_qui_enabled={gui_enabled}
-    """
-    )
-
-    testdir.makepyfile(
-        f"""
-        import os
-
-        def test_offscreen(qgis_new_project):
-            assert (os.environ.get("QT_QPA_PLATFORM", "") ==
-            "{'offscreen' if not gui_enabled else ''}")
-    """
-    )
-    result = testdir.runpytest("--qgis_disable_init")
-    result.assert_outcomes(passed=1)
-
-    result = testdir.runpytest("--qgis_disable_init", "--qgis_disable_gui")
-    result.assert_outcomes(
-        passed=1 if not gui_enabled else 0, failed=1 if gui_enabled else 0
-    )
+def test_iface_toolbar(qgis_iface):
+    name = "test_bar"
+    toolbar: QToolBar = qgis_iface.addToolBar(name)
+    assert toolbar.windowTitle() == name
+    assert qgis_iface._toolbars == {name: toolbar}

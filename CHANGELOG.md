@@ -1,3 +1,8 @@
+# Version: 1.3.0 (18-01-2022)
+
+* [#17](https://github.com/GispoCoding/pytest-qgis/pull/17): Add QgisBot to make it easier to access utility functions
+* [#14](https://github.com/GispoCoding/pytest-qgis/pull/14): Use QMainWindow with parent and store toolbars with iface.addToolBar
+
 # Version: 1.2.0 (17-01-2022)
 
 * [#10](https://github.com/GispoCoding/pytest-qgis/pull/10): Allow showing attribute dialog

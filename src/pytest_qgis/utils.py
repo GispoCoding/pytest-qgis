@@ -19,7 +19,7 @@
 from collections import Counter
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, List, Optional
 
 import sip
 from osgeo import gdal
@@ -35,8 +35,6 @@ from qgis.core import (
     QgsRectangle,
     QgsVectorLayer,
 )
-from qgis.gui import QgsAttributeDialog
-from qgis.PyQt.QtWidgets import QLabel, QWidget
 
 DEFAULT_RASTER_FORMAT = "tif"
 
@@ -172,30 +170,6 @@ def copy_layer_style_and_position(
     ]
 
     group.insertLayer(index + 1, layer2)
-
-
-def get_qgs_attribute_dialog_widgets_by_name(
-    widget: Union[QgsAttributeDialog, QWidget]
-) -> Dict[str, QWidget]:
-    """
-    Gets recursively all attribute dialog widgets by name.
-    :param widget: QgsAttributeDialog for the first time, afterwards QWidget.
-    :return: Dictionary with field names as keys and corresponding QWidgets as values.
-    """
-    widgets_by_name = {}
-    for child in widget.children():
-        if isinstance(child, QLabel):
-            if child.text() != "" and child.toolTip() != "":
-                related_widget = child.buddy()
-                if related_widget is not None:
-                    widgets_by_name[child.text()] = child.buddy()
-        if hasattr(child, "children"):
-            widgets_by_name = {
-                **widgets_by_name,
-                **get_qgs_attribute_dialog_widgets_by_name(child),
-            }
-
-    return widgets_by_name
 
 
 def clean_qgis_layer(fn: Callable) -> Callable:
