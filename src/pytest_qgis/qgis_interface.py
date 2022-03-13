@@ -62,6 +62,7 @@ class QgisInterface(QObject):
     """
 
     currentLayerChanged = pyqtSignal(QgsMapCanvas)  # noqa N802
+    newProjectCreated = pyqtSignal()  # noqa N802
 
     def __init__(
         self, canvas: QgsMapCanvas, messageBar: MockMessageBar, mainWindow: QMainWindow
@@ -135,6 +136,7 @@ class QgisInterface(QObject):
         for relation in relation_manager.relations():
             relation_manager.removeRelation(relation)
         self._layers = []
+        self.newProjectCreated.emit()
 
     # ---------------- API Mock for QgsInterface follows -------------------
 
