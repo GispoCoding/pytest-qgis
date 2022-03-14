@@ -73,7 +73,7 @@ CANVAS_DESCRIPTION = "Set canvas height and width."
 CANVAS_SIZE_DEFAULT = (600, 600)
 
 DISABLE_QGIS_INIT_KEY = "qgis_disable_init"
-DISABLE_QGIS_INIT_DESCRIPTION = "Prevent QGIS (QgsApllication) from initializing."
+DISABLE_QGIS_INIT_DESCRIPTION = "Prevent QGIS (QgsApplication) from initializing."
 
 SHOW_MAP_MARKER = "qgis_show_map"
 SHOW_MAP_VISIBILITY_TIMEOUT_DEFAULT = 30
