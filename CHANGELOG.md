@@ -1,3 +1,8 @@
+# Version: 1.3.1 (17-03-2022)
+
+* [#21](https://github.com/GispoCoding/pytest-qgis/pull/21): Add a newProjectCreated signal to QgisInterface mock class
+
+
 # Version: 1.3.0 (18-01-2022)
 
 * [#17](https://github.com/GispoCoding/pytest-qgis/pull/17): Add QgisBot to make it easier to access utility functions
