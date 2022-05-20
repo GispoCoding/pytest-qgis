@@ -106,8 +106,16 @@ def test_iface_active_layer(qgis_iface, layer_polygon, layer_points):
     assert qgis_iface.activeLayer() == layer_points
 
 
-def test_iface_toolbar(qgis_iface):
+def test_iface_toolbar_str(qgis_iface):
     name = "test_bar"
     toolbar: QToolBar = qgis_iface.addToolBar(name)
+    assert toolbar.windowTitle() == name
+    assert qgis_iface._toolbars == {name: toolbar}
+
+
+def test_iface_toolbar_qtoolbar(qgis_iface):
+    name = "test_bar"
+    toolbar: QToolBar = QToolBar(name)
+    qgis_iface.addToolBar(toolbar)
     assert toolbar.windowTitle() == name
     assert qgis_iface._toolbars == {name: toolbar}

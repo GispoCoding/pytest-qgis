@@ -27,7 +27,7 @@ __copyright__ = (
 )
 
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import sip
 from qgis.core import (
@@ -220,15 +220,19 @@ class QgisInterface(QObject):
         """
         pass
 
-    def addToolBar(self, name: str) -> QToolBar:
+    def addToolBar(self, toolbar: Union[str, QToolBar]) -> QToolBar:
         """Add toolbar with specified name.
 
-        :param name: Name for the toolbar.
-        :type name: str
+        :param toolbar: Name for the toolbar or QToolBar object.
         """
-        toolbar = QToolBar(name, parent=self._mainWindow)
-        self._toolbars[name] = toolbar
-        return toolbar
+        if isinstance(toolbar, str):
+            name = toolbar
+            _toolbar = QToolBar(name, parent=self._mainWindow)
+        else:
+            name = toolbar.windowTitle()
+            _toolbar = toolbar
+        self._toolbars[name] = _toolbar
+        return _toolbar
 
     def mapCanvas(self) -> QgsMapCanvas:
         """Return a pointer to the map canvas."""
