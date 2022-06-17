@@ -17,6 +17,7 @@
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 import time
 
+import pytest
 from qgis.gui import QgsAttributeDialog
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import QCoreApplication
@@ -26,6 +27,7 @@ from ..utils import IN_CI
 TIMEOUT = 0.01 if IN_CI else 1
 
 
+@pytest.mark.with_pytest_qt()
 def test_attribute_dialog_change(
     qgis_iface, qgis_canvas, layer_points, qgis_bot, qtbot
 ):

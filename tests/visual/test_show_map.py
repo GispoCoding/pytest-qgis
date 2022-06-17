@@ -23,6 +23,11 @@ from ..utils import IN_CI, QGIS_VERSION
 
 """
 These tests are meant to be tested visually by the developer.
+
+NOTE: if you have pytest-qt installed, you might encounter some
+problems with tests in this module.
+
+In that case, run these tests with pytest-qt disabled: "pytest -p no:pytest-qt"
 """
 
 DEFAULT_TIMEOUT = 0.01 if IN_CI else 1
