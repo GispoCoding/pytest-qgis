@@ -1,3 +1,7 @@
+# Version: 1.3.2 (26-06-2022)
+
+* [#23](https://github.com/GispoCoding/pytest-qgis/pull/23): Support QToolBar as an arg in iface.addToolBar
+
 # Version: 1.3.1 (17-03-2022)
 
 * [#21](https://github.com/GispoCoding/pytest-qgis/pull/21): Add a newProjectCreated signal to QgisInterface mock class
