@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#  Copyright (C) 2021 pytest-qgis Contributors.
+#  Copyright (C) 2021-2023 pytest-qgis Contributors.
 #
 #
 #  This file is part of pytest-qgis.
@@ -34,7 +34,7 @@ from _pytest.tmpdir import TempPathFactory
 from qgis.core import Qgis, QgsApplication, QgsProject, QgsRectangle, QgsVectorLayer
 from qgis.gui import QgisInterface as QgisInterfaceOrig
 from qgis.gui import QgsGui, QgsLayerTreeMapCanvasBridge, QgsMapCanvas
-from qgis.PyQt import QtCore, QtWidgets
+from qgis.PyQt import QtCore, QtWidgets, sip
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtWidgets import QMainWindow, QMessageBox, QWidget
 
@@ -150,6 +150,8 @@ def qgis_app(request: "SubRequest") -> QgsApplication:
 
     if not request.config._plugin_settings.qgis_init_disabled:
         assert _APP
+        if not sip.isdeleted(_CANVAS):
+            sip.delete(_CANVAS)
         _APP.exitQgis()
 
 
