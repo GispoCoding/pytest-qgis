@@ -1,5 +1,4 @@
 -c requirements.txt
--e file:.
 
 # packaging
 twine
@@ -14,8 +13,10 @@ pre-commit
 # for ide linting
 flake8
 black
+mypy
 isort
 flake8-bugbear
 pep8-naming
 flake8-annotations
 flake8-qgis
+flake8-pytest-style
