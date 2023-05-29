@@ -1,4 +1,5 @@
 -c requirements.txt
+-e file:.
 
 # packaging
 twine

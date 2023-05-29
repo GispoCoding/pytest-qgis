@@ -4,18 +4,12 @@
 #
 #    pip-compile
 #
--e file:.
-    # via -r requirements.in
 atomicwrites==1.4.1
     # via pytest
-attrs==22.2.0
-    # via
-    #   -r requirements.in
-    #   pytest
-colorama==0.4.5
-    # via
-    #   -r requirements.in
-    #   pytest
+attrs==23.1.0
+    # via pytest
+colorama==0.4.6
+    # via pytest
 iniconfig==2.0.0
     # via pytest
 packaging==23.1
@@ -25,8 +19,6 @@ pluggy==1.0.0
 py==1.11.0
     # via pytest
 pytest==6.2.5
-    # via
-    #   -r requirements.in
-    #   pytest-qgis
+    # via -r requirements.in
 toml==0.10.2
     # via pytest
