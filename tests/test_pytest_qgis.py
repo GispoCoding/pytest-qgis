@@ -1,4 +1,4 @@
-#  Copyright (C) 2021 pytest-qgis Contributors.
+#  Copyright (C) 2021-2023 pytest-qgis Contributors.
 #
 #
 #  This file is part of pytest-qgis.
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     pass
 
 # DO not use this directly, this is only meant to be used with
-# replace_iface_with_qgis_iface fixtrure
+# replace_iface_with_qgis_iface fixture
 __iface = None
 
 
@@ -119,3 +119,9 @@ def test_iface_toolbar_qtoolbar(qgis_iface):
     qgis_iface.addToolBar(toolbar)
     assert toolbar.windowTitle() == name
     assert qgis_iface._toolbars == {name: toolbar}
+
+
+def test_canvas_should_be_released(qgis_canvas, layer_polygon, layer_points):
+    QgsProject.instance().addMapLayer(layer_polygon)
+    QgsProject.instance().addMapLayer(layer_points)
+    qgis_canvas.zoomToFullExtent()
