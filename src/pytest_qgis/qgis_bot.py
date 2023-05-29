@@ -39,7 +39,6 @@ class QgisBot:
         self,
         iface: QgisInterface,
     ) -> None:
-
         self._iface = iface
 
     def create_feature_with_attribute_dialog(

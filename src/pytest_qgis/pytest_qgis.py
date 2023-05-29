@@ -202,6 +202,7 @@ def new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
     warnings.warn(
         "new_project fixture will be deprecated. " "Use qgis_new_project instead.",
         PendingDeprecationWarning,
+        stacklevel=2,
     )
     qgis_iface.newProject()
 
@@ -324,12 +325,14 @@ def _show_qgis_dlg(common_settings: Settings, qgis_parent: QWidget) -> None:
     elif not common_settings.gui_enabled:
         warnings.warn(
             "Cannot show QGIS map because the GUI is not enabled. "
-            "Set qgis_qui_enabled=True in pytest.ini."
+            "Set qgis_qui_enabled=True in pytest.ini.",
+            stacklevel=1,
         )
     elif common_settings.qgis_init_disabled:
         warnings.warn(
             "Cannot show QGIS map because QGIS is not initialized. "
-            "Run the tests without --qgis_disable_init to enable QGIS map."
+            "Run the tests without --qgis_disable_init to enable QGIS map.",
+            stacklevel=1,
         )
 
 
