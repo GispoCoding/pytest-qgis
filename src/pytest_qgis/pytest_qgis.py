@@ -150,8 +150,8 @@ def qgis_app(request: "SubRequest") -> QgsApplication:
 
     if not request.config._plugin_settings.qgis_init_disabled:
         assert _APP
-        if not sip.isdeleted(_CANVAS):
-            sip.delete(_CANVAS)
+        if not sip.isdeleted(_CANVAS) and _CANVAS is not None:
+            _CANVAS.deleteLater()
         _APP.exitQgis()
 
 
