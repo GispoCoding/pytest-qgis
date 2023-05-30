@@ -122,6 +122,11 @@ def test_iface_toolbar_qtoolbar(qgis_iface):
 
 
 def test_canvas_should_be_released(qgis_canvas, layer_polygon, layer_points):
+    """
+    This test will not assert anything but calling zoom methods of qgis_canvas
+    will cause segmentation faults after test session if
+    the canvas is not released properly.
+    """
     QgsProject.instance().addMapLayer(layer_polygon)
     QgsProject.instance().addMapLayer(layer_points)
     qgis_canvas.zoomToFullExtent()
