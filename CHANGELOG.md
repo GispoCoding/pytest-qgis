@@ -1,3 +1,7 @@
+# Version: 1.3.3 (31-05-2023)
+
+* [#29](https://github.com/GispoCoding/pytest-qgis/pull/29): Release map canvas properly
+
 # Version: 1.3.2 (26-06-2022)
 
 * [#23](https://github.com/GispoCoding/pytest-qgis/pull/23): Support QToolBar as an arg in iface.addToolBar
