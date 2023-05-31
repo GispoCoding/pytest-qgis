@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Create Release
+    name: Build Release
     runs-on: ubuntu-latest
 
     steps:
@@ -32,6 +32,7 @@ jobs:
 
   release:
     name: Deploy Release
+    needs: build
     runs-on: ubuntu-latest
     env:
       name: pypi-release
