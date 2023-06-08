@@ -56,7 +56,7 @@ markers can be used.
   to ensure that they are cleaned properly if they are used but not added to the `QgsProject`. This is only needed with
   layers with other than memory provider.
    ```python
-   # conftest.py of start of a test file
+   # conftest.py or start of a test file
    import pytest
    from pytest_qgis.utils import clean_qgis_layer
    from qgis.core import QgsVectorLayer
@@ -74,11 +74,13 @@ markers can be used.
   configure [`QgsApplication`](https://qgis.org/pyqgis/master/core/QgsApplication.html). With QGIS >= 3.18 it is also
   used to patch `qgis.utils.iface` with `qgis_iface` automatically.
 
+  > Be careful not to import modules importing `qgis.utils.iface` in the root of conftest, because the `pytest_configure` hook has not yet patched `iface` in that point. See [this issue](https://github.com/GispoCoding/pytest-qgis/issues/35) for details.
+
 ### Command line options
 
 * `--qgis_disable_gui` can be used to disable graphical user interface in tests. This speeds up the tests that use Qt
   widgets of the plugin.
-* `--qgis_disable_init` can be used to prevent QGIS (QgsApllication) from initializing. Mainly used in internal testing.
+* `--qgis_disable_init` can be used to prevent QGIS (QgsApplication) from initializing. Mainly used in internal testing.
 
 ### ini-options
 
