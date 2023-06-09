@@ -22,6 +22,7 @@
 import os.path
 import shutil
 import sys
+import tempfile
 import time
 import warnings
 from collections import namedtuple
@@ -30,7 +31,6 @@ from typing import TYPE_CHECKING, Optional
 from unittest import mock
 
 import pytest
-from _pytest.tmpdir import TempPathFactory
 from qgis.core import Qgis, QgsApplication, QgsProject, QgsRectangle, QgsVectorLayer
 from qgis.gui import QgisInterface as QgisInterfaceOrig
 from qgis.gui import QgsGui, QgsLayerTreeMapCanvasBridge, QgsMapCanvas
@@ -92,6 +92,7 @@ _CANVAS: Optional[QgsMapCanvas] = None
 _IFACE: Optional[QgisInterface] = None
 _PARENT: Optional[QtWidgets.QWidget] = None
 _AUTOUSE_QGIS: Optional[bool] = None
+_QGIS_CONFIG_PATH: Optional[Path] = None
 
 try:
     _QGIS_VERSION = Qgis.versionInt()
@@ -153,6 +154,8 @@ def qgis_app(request: "SubRequest") -> QgsApplication:
         if not sip.isdeleted(_CANVAS) and _CANVAS is not None:
             _CANVAS.deleteLater()
         _APP.exitQgis()
+        if _QGIS_CONFIG_PATH and _QGIS_CONFIG_PATH.exists():
+            shutil.rmtree(_QGIS_CONFIG_PATH)
 
 
 @pytest.fixture(scope="session")
@@ -280,13 +283,12 @@ def qgis_show_map(
 
 
 def _start_and_configure_qgis_app(config: "Config") -> None:
-    global _APP, _CANVAS, _IFACE, _PARENT
+    global _APP, _CANVAS, _IFACE, _PARENT, _QGIS_CONFIG_PATH
     settings: Settings = config._plugin_settings  # type: ignore
 
     # Use temporary path for QGIS config
-    tmp_path_factory = TempPathFactory.from_config(config, _ispytest=True)
-    config_path = tmp_path_factory.mktemp("qgis-test")
-    os.environ["QGIS_CUSTOM_CONFIG_PATH"] = str(config_path)
+    _QGIS_CONFIG_PATH = Path(tempfile.mkdtemp(prefix="pytest-qgis"))
+    os.environ["QGIS_CUSTOM_CONFIG_PATH"] = str(_QGIS_CONFIG_PATH)
 
     if not settings.qgis_init_disabled:
         _APP = QgsApplication([], GUIenabled=settings.gui_enabled)
