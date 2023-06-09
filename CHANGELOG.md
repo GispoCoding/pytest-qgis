@@ -1,5 +1,9 @@
 # Version: 1.3.3 (31-05-2023)
 
+* [#34](https://github.com/GispoCoding/pytest-qgis/pull/34): Use tempfile instead of protected TempPathFactory in QGIS config path creation
+
+# Version: 1.3.3 (31-05-2023)
+
 * [#29](https://github.com/GispoCoding/pytest-qgis/pull/29): Release map canvas properly
 
 # Version: 1.3.2 (26-06-2022)
