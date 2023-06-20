@@ -1,4 +1,4 @@
-#  Copyright (C) 2021-2022 pytest-qgis Contributors.
+#  Copyright (C) 2021-2023 pytest-qgis Contributors.
 #
 #
 #  This file is part of pytest-qgis.
@@ -20,7 +20,7 @@ import pytest
 from qgis.gui import QgsAttributeDialog
 from qgis.PyQt import QtCore
 
-from ..utils import IN_CI
+from tests.utils import IN_CI
 
 TIMEOUT = 10 if IN_CI else 1000
 

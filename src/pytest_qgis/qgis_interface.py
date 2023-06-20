@@ -23,13 +23,12 @@ __copyright__ = (
     "Copyright (c) 2010 by Ivan Mincik, ivan.mincik@gista.sk and "
     "Copyright (c) 2011 German Carrillo, geotux_tuxman@linuxmail.org"
     "Copyright (c) 2014 Tim Sutton, tim@linfiniti.com"
-    "Copyright (c) 2021 pytest-qgis Contributors"
+    "Copyright (c) 2021-2023 pytest-qgis Contributors"
 )
 
 import logging
 from typing import Dict, List, Optional, Union
 
-import sip
 from qgis.core import (
     QgsLayerTree,
     QgsMapLayer,
@@ -38,6 +37,7 @@ from qgis.core import (
     QgsVectorLayer,
 )
 from qgis.gui import QgsMapCanvas
+from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QObject, pyqtSignal, pyqtSlot
 from qgis.PyQt.QtWidgets import (
     QAction,
@@ -61,8 +61,8 @@ class QgisInterface(QObject):
     so most methods are simply stubs.
     """
 
-    currentLayerChanged = pyqtSignal(QgsMapCanvas)  # noqa N802
-    newProjectCreated = pyqtSignal()  # noqa N802
+    currentLayerChanged = pyqtSignal(QgsMapCanvas)  # noqa: N815
+    newProjectCreated = pyqtSignal()  # noqa: N815
 
     def __init__(
         self, canvas: QgsMapCanvas, messageBar: MockMessageBar, mainWindow: QMainWindow
@@ -142,19 +142,15 @@ class QgisInterface(QObject):
 
     def zoomFull(self) -> None:
         """Zoom to the map full extent."""
-        pass
 
     def zoomToPrevious(self) -> None:
         """Zoom to previous view extent."""
-        pass
 
     def zoomToNext(self) -> None:
         """Zoom to next view extent."""
-        pass
 
     def zoomToActiveLayer(self) -> None:
         """Zoom to extent of active layer."""
-        pass
 
     def addVectorLayer(
         self, path: str, base_name: str, provider_key: str
@@ -183,7 +179,6 @@ class QgisInterface(QObject):
         :param base_name: Base name for layer.
         :type base_name: str
         """
-        pass
 
     def activeLayer(self) -> Optional[QgsMapLayer]:
         """Get pointer to the active layer (layer selected in the legend)."""
@@ -202,7 +197,6 @@ class QgisInterface(QObject):
         :param action: Action to add to menu.
         :type action: QAction
         """
-        pass
 
     def addToolBarIcon(self, action: QAction) -> None:
         """Add an icon to the plugins toolbar.
@@ -210,7 +204,6 @@ class QgisInterface(QObject):
         :param action: Action to add to the toolbar.
         :type action: QAction
         """
-        pass
 
     def removeToolBarIcon(self, action: QAction) -> None:
         """Remove an action (icon) from the plugin toolbar.
@@ -218,7 +211,6 @@ class QgisInterface(QObject):
         :param action: Action to add to the toolbar.
         :type action: QAction
         """
-        pass
 
     def addToolBar(self, toolbar: Union[str, QToolBar]) -> QToolBar:
         """Add toolbar with specified name.
@@ -245,9 +237,7 @@ class QgisInterface(QObject):
         """
         return self._mainWindow
 
-    def addDockWidget(
-        self, area: int, dock_widget: QDockWidget
-    ) -> None:  # noqa: ANN001
+    def addDockWidget(self, area: int, dock_widget: QDockWidget) -> None:
         """Add a dock widget to the main window.
 
         :param area: Where in the ui the dock should be placed.
@@ -256,7 +246,6 @@ class QgisInterface(QObject):
         :param dock_widget: A dock widget to add to the UI.
         :type dock_widget: QDockWidget
         """
-        pass
 
     def legendInterface(self) -> QgsMapCanvas:
         """Get the legend."""

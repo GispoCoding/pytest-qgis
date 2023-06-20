@@ -22,7 +22,7 @@ from qgis.core import Qgis, QgsProcessing, QgsProject, QgsVectorLayer
 from qgis.PyQt.QtWidgets import QToolBar
 from qgis.utils import iface
 
-from .utils import QGIS_VERSION
+from tests.utils import QGIS_VERSION
 
 if TYPE_CHECKING:
     pass
@@ -45,7 +45,6 @@ def test_a_teardown():
     it might cause problems with pytest_qgis.qgis_interface.removeAllLayers
     when qgis_app is exiting.
     """
-    pass
 
 
 def test_add_layer():

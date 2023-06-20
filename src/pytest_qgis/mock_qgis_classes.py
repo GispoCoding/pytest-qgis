@@ -1,4 +1,4 @@
-#  Copyright (C) 2021 pytest-qgis Contributors.
+#  Copyright (C) 2021-2023 pytest-qgis Contributors.
 #
 #
 #  This file is part of pytest-qgis.
@@ -39,7 +39,7 @@ class MockMessageBar(QObject):
         """Used to test which messages have been logged."""
         return self.messages[level]
 
-    def pushMessage(  # noqa N802
+    def pushMessage(  # noqa: N802
         self, title: str, text: str, level: int, duration: int
     ) -> None:
         """A mocked method for pushing a message to the bar."""
