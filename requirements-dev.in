@@ -13,11 +13,17 @@ pytest-qt==3.3.0
 pre-commit
 # for ide linting
 flake8
+flake8-annotations
+flake8-bugbear
+flake8-comprehensions
+flake8-noqa
+flake8-pie
+flake8-print
+flake8-pytest-style
+flake8-qgis
+flake8-simplify
+flake8-tidy-imports
 black
 mypy
 isort
-flake8-bugbear
 pep8-naming
-flake8-annotations
-flake8-qgis
-flake8-pytest-style
