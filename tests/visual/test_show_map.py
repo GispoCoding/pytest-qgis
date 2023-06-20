@@ -43,6 +43,11 @@ def test_show_map(layer_polygon):
     QgsProject.instance().addMapLayers([layer_polygon])
 
 
+@pytest.mark.qgis_show_map(timeout=0)
+def test_show_map_with_zero_timeout(layer_polygon):
+    QgsProject.instance().addMapLayers([layer_polygon])
+
+
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT, extent=QgsRectangle(25, 65, 26, 66))
 def test_show_map_custom_extent(layer_polygon):
     QgsProject.instance().addMapLayers([layer_polygon])
