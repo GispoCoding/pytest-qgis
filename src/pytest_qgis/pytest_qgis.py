@@ -349,6 +349,10 @@ def _configure_qgis_map(
     settings: ShowMapSettings,
     tmp_path: Path,
 ) -> None:
+    if settings.timeout == 0:
+        qgis_parent.close()
+        return
+
     message_box = QMessageBox(qgis_parent)
 
     try:
