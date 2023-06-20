@@ -264,6 +264,10 @@ def qgis_show_map(
     common_settings: Settings = request.config._plugin_settings  # type: ignore
 
     if show_map_marker:
+        # Assign the bridge to have correct layer order and visibilities
+        bridge = QgsLayerTreeMapCanvasBridge(  # noqa: F841, this needs to be assigned
+            QgsProject.instance().layerTreeRoot(), qgis_iface.mapCanvas()
+        )
         _show_qgis_dlg(common_settings, qgis_parent)
 
     yield
@@ -346,9 +350,7 @@ def _configure_qgis_map(
     tmp_path: Path,
 ) -> None:
     message_box = QMessageBox(qgis_parent)
-    bridge = QgsLayerTreeMapCanvasBridge(  # noqa: F841, this needs to be assigned
-        QgsProject.instance().layerTreeRoot(), qgis_iface.mapCanvas()
-    )
+
     try:
         # Change project CRS to most common CRS if it is not set
         if not QgsProject.instance().crs().isValid():
