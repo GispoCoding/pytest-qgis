@@ -15,16 +15,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
-import time
 
 import pytest
 from qgis.gui import QgsAttributeDialog
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtCore import QCoreApplication
 
 from ..utils import IN_CI
 
-TIMEOUT = 0.01 if IN_CI else 1
+TIMEOUT = 10 if IN_CI else 1000
 
 
 @pytest.mark.with_pytest_qt()
@@ -55,9 +53,7 @@ def test_attribute_dialog_change(
     qtbot.mouseDClick(widgets_by_name["text_field"], QtCore.Qt.LeftButton)
     qtbot.keyClicks(widgets_by_name["text_field"], test_text)
 
-    t = time.time()
-    while time.time() - t < TIMEOUT and dialog.isVisible():
-        QCoreApplication.processEvents()
+    qtbot.wait(TIMEOUT)
     dialog.accept()
     layer.commitChanges()
 
