@@ -188,7 +188,7 @@ def qgis_processing(qgis_app: QgsApplication) -> None:
 
 
 @pytest.fixture()
-def qgis_new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
+def qgis_new_project(qgis_iface: QgisInterface) -> None:  # noqa: QGS105
     """
     Initializes new QGIS project by removing layers and relations etc.
     """
@@ -196,7 +196,7 @@ def qgis_new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
 
 
 @pytest.fixture()
-def new_project(qgis_iface: QgisInterface) -> None:  # noqa QGS105
+def new_project(qgis_iface: QgisInterface) -> None:  # noqa: QGS105
     """
     Initializes new QGIS project by removing layers and relations etc.
 
@@ -473,8 +473,7 @@ def _get_world_map_geopackage(tmp_path: Path) -> Path:
     assert world_map_gpkg.exists(), world_map_gpkg
 
     # Copy the geopackage to allow modifications
-    path_to_copied_geopackage = Path(shutil.copy(world_map_gpkg, tmp_path))
-    return path_to_copied_geopackage
+    return Path(shutil.copy(world_map_gpkg, tmp_path))
 
 
 def _get_countries_layer(geopackage: Path) -> QgsVectorLayer:

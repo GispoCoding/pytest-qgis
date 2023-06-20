@@ -1,4 +1,4 @@
-#  Copyright (C) 2021 pytest-qgis Contributors.
+#  Copyright (C) 2021-2023 pytest-qgis Contributors.
 #
 #
 #  This file is part of pytest-qgis.
@@ -17,8 +17,8 @@
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-import sip
 from qgis.core import QgsCoordinateReferenceSystem, QgsProject, QgsVectorLayer
+from qgis.PyQt import sip
 
 from pytest_qgis.utils import (
     clean_qgis_layer,
@@ -27,8 +27,7 @@ from pytest_qgis.utils import (
     replace_layers_with_reprojected_clones,
     set_map_crs_based_on_layers,
 )
-
-from .utils import QGIS_VERSION
+from tests.utils import QGIS_VERSION
 
 EPSG_4326 = "EPSG:4326"
 EPSG_3067 = "EPSG:3067"

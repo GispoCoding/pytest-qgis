@@ -1,4 +1,4 @@
-#  Copyright (C) 2021 pytest-qgis Contributors.
+#  Copyright (C) 2021-2023 pytest-qgis Contributors.
 #
 #
 #  This file is part of pytest-qgis.
@@ -21,7 +21,6 @@ from functools import wraps
 from pathlib import Path
 from typing import Any, Callable, List, Optional
 
-import sip
 from osgeo import gdal
 from qgis.core import (
     QgsCoordinateReferenceSystem,
@@ -35,6 +34,7 @@ from qgis.core import (
     QgsRectangle,
     QgsVectorLayer,
 )
+from qgis.PyQt import sip
 
 DEFAULT_RASTER_FORMAT = "tif"
 
@@ -87,8 +87,7 @@ def transform_rectangle(
         QgsCoordinateReferenceSystem(out_crs),
         QgsProject.instance(),
     )
-    box = transform.transformBoundingBox(rectangle)
-    return box
+    return transform.transformBoundingBox(rectangle)
 
 
 def get_layers_with_different_crs() -> List[QgsMapLayer]:
@@ -137,7 +136,7 @@ def replace_layers_with_reprojected_clones(
                 output_raster, input_layer.source(), dstSRS=map_crs.authid()
             )
         finally:
-            warp = None  # noqa F841
+            warp = None  # noqa: F841
 
         copy_layer_style_and_position(
             input_layer, QgsRasterLayer(output_raster), output_path

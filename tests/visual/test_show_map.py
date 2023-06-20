@@ -1,4 +1,4 @@
-#  Copyright (C) 2021 pytest-qgis Contributors.
+#  Copyright (C) 2021-2023 pytest-qgis Contributors.
 #
 #
 #  This file is part of pytest-qgis.
@@ -19,7 +19,7 @@
 import pytest
 from qgis.core import QgsProject, QgsRectangle
 
-from ..utils import IN_CI, QGIS_VERSION
+from tests.utils import IN_CI, QGIS_VERSION
 
 """
 These tests are meant to be tested visually by the developer.

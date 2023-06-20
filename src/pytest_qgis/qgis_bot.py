@@ -1,4 +1,4 @@
-#  Copyright (C) 2021-2022 pytest-qgis Contributors.
+#  Copyright (C) 2021-2023 pytest-qgis Contributors.
 #
 #
 #  This file is part of pytest-qgis.
@@ -105,11 +105,13 @@ class QgisBot:
         """
         widgets_by_name = {}
         for child in widget.children():
-            if isinstance(child, QLabel):
-                if child.text() != "" and child.toolTip() != "":
-                    related_widget = child.buddy()
-                    if related_widget is not None:
-                        widgets_by_name[child.text()] = child.buddy()
+            if (
+                isinstance(child, QLabel)
+                and child.text() != ""
+                and child.toolTip() != ""
+                and child.buddy() is not None
+            ):
+                widgets_by_name[child.text()] = child.buddy()
             if hasattr(child, "children"):
                 widgets_by_name = {
                     **widgets_by_name,
