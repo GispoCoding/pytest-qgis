@@ -18,7 +18,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 
-
+import contextlib
 import os.path
 import shutil
 import sys
@@ -155,7 +155,9 @@ def qgis_app(request: "SubRequest") -> QgsApplication:
             _CANVAS.deleteLater()
         _APP.exitQgis()
         if _QGIS_CONFIG_PATH and _QGIS_CONFIG_PATH.exists():
-            shutil.rmtree(_QGIS_CONFIG_PATH)
+            # TODO: https://github.com/GispoCoding/pytest-qgis/issues/43
+            with contextlib.suppress(PermissionError):
+                shutil.rmtree(_QGIS_CONFIG_PATH)
 
 
 @pytest.fixture(scope="session")
