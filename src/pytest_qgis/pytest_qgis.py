@@ -325,19 +325,19 @@ def _initialize_processing(qgis_app: QgsApplication) -> None:
 
 
 def _show_qgis_dlg(common_settings: Settings, qgis_parent: QWidget) -> None:
-    if common_settings.gui_enabled and not common_settings.qgis_init_disabled:
+    if not common_settings.qgis_init_disabled:
         qgis_parent.setWindowTitle("Test QGIS dialog opened by Pytest-qgis")
         qgis_parent.show()
-    elif not common_settings.gui_enabled:
-        warnings.warn(
-            "Cannot show QGIS map because the GUI is not enabled. "
-            "Set qgis_qui_enabled=True in pytest.ini.",
-            stacklevel=1,
-        )
     elif common_settings.qgis_init_disabled:
         warnings.warn(
             "Cannot show QGIS map because QGIS is not initialized. "
             "Run the tests without --qgis_disable_init to enable QGIS map.",
+            stacklevel=1,
+        )
+    if not common_settings.gui_enabled:
+        warnings.warn(
+            "QGIS map is not visible because the GUI is not enabled. "
+            "Set qgis_qui_enabled=True in pytest.ini to see the window.",
             stacklevel=1,
         )
 
