@@ -390,10 +390,7 @@ def _configure_qgis_map(
             f"It will close automatically in {settings.timeout} seconds."
         )
         message_box.addButton(QMessageBox.Close)
-        message_box.move(
-            message_box.mapToGlobal(qgis_parent.rect().topLeft())
-            - QtCore.QPoint(message_box.width(), 0)
-        )
+        message_box.move(QgsApplication.instance().primaryScreen().geometry().topLeft())
         message_box.setWindowModality(QtCore.Qt.NonModal)
         message_box.show()
 
