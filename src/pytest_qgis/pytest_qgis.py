@@ -300,6 +300,7 @@ def _start_and_configure_qgis_app(config: "Config") -> None:
         QgsGui.editorWidgetRegistry().initEditors()
     _PARENT = QMainWindow()
     _CANVAS = QgsMapCanvas(_PARENT)
+    _PARENT.resize(QtCore.QSize(settings.canvas_width, settings.canvas_height))
     _CANVAS.resize(QtCore.QSize(settings.canvas_width, settings.canvas_height))
 
     # QgisInterface is a stub implementation of the QGIS plugin interface

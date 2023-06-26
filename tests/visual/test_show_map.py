@@ -39,8 +39,9 @@ def setup(qgis_new_project):
 
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT)
-def test_show_map(layer_polygon):
+def test_show_map(layer_polygon, qgis_canvas, qgis_parent):
     QgsProject.instance().addMapLayers([layer_polygon])
+    assert qgis_parent.size() == qgis_canvas.size()
 
 
 @pytest.mark.qgis_show_map(timeout=0)
