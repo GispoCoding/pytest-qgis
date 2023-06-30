@@ -1,4 +1,11 @@
-# Version: 1.3.3 (31-05-2023)
+
+# Version 1.3.5 (30-06-2023)
+* [#34](https://github.com/GispoCoding/pytest-qgis/pull/34) Use tempfile instead of protected TempPathFactory in QGIS config path creation
+* [#39](https://github.com/GispoCoding/pytest-qgis/pull/39) Improve code style and CI
+* [#40](https://github.com/GispoCoding/pytest-qgis/pull/40) Improve showing map
+* [#42](https://github.com/GispoCoding/pytest-qgis/pull/42) Suppress errors when deleting temp dir
+
+# Version: 1.3.4 (31-05-2023)
 
 * [#34](https://github.com/GispoCoding/pytest-qgis/pull/34): Use tempfile instead of protected TempPathFactory in QGIS config path creation
 
