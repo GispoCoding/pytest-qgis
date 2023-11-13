@@ -130,6 +130,9 @@ def replace_layers_with_reprojected_clones(
             "native:reprojectlayer",
             {"INPUT": input_layer, "TARGET_CRS": map_crs, "OUTPUT": "TEMPORARY_OUTPUT"},
         )["OUTPUT"]
+        if not output_layer.crs().isValid():
+            output_layer.setCrs(map_crs)
+
         copy_layer_style_and_position(input_layer, output_layer, output_path)
 
     for input_layer in raster_layers:
@@ -140,12 +143,14 @@ def replace_layers_with_reprojected_clones(
             warp = gdal.Warp(
                 output_raster, input_layer.source(), dstSRS=map_crs.authid()
             )
+
         finally:
             warp = None  # noqa: F841
 
-        copy_layer_style_and_position(
-            input_layer, QgsRasterLayer(output_raster), output_path
-        )
+        output_layer = QgsRasterLayer(output_raster)
+        if not output_layer.crs().isValid():
+            output_layer.setCrs(map_crs)
+        copy_layer_style_and_position(input_layer, output_layer, output_path)
 
     # Remove originals from project
     QgsProject.instance().removeMapLayers([layer.id() for layer in layers])

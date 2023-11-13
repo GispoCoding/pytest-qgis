@@ -17,7 +17,7 @@
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-from qgis.core import QgsCoordinateReferenceSystem, QgsProject, QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorLayer
 from qgis.PyQt import sip
 
 from pytest_qgis.utils import (
@@ -27,12 +27,7 @@ from pytest_qgis.utils import (
     replace_layers_with_reprojected_clones,
     set_map_crs_based_on_layers,
 )
-from tests.utils import QGIS_VERSION
-
-EPSG_4326 = "EPSG:4326"
-EPSG_3067 = "EPSG:3067"
-
-DEFAULT_CRS = QgsCoordinateReferenceSystem(EPSG_4326)
+from tests.utils import DEFAULT_CRS, EPSG_3067, EPSG_4326, QGIS_VERSION
 
 
 @pytest.fixture()

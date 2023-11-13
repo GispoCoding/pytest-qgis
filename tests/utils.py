@@ -18,7 +18,7 @@
 #
 import os
 
-from qgis.core import Qgis
+from qgis.core import Qgis, QgsCoordinateReferenceSystem
 
 try:
     QGIS_VERSION = Qgis.versionInt()
@@ -26,3 +26,9 @@ except AttributeError:
     QGIS_VERSION = Qgis.QGIS_VERSION_INT
 
 IN_CI = os.environ.get("QGIS_IN_CI")
+
+EPSG_4326 = "EPSG:4326"
+EPSG_3067 = "EPSG:3067"
+
+DEFAULT_CRS = QgsCoordinateReferenceSystem(EPSG_4326)
+CRS_3067 = QgsCoordinateReferenceSystem(EPSG_3067)
