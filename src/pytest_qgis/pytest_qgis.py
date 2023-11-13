@@ -42,7 +42,7 @@ from pytest_qgis.mock_qgis_classes import MockMessageBar
 from pytest_qgis.qgis_bot import QgisBot
 from pytest_qgis.qgis_interface import QgisInterface
 from pytest_qgis.utils import (
-    clean_qgis_layer,
+    ensure_qgis_layer_fixtures_are_cleaned,
     get_common_extent_from_all_layers,
     get_layers_with_different_crs,
     replace_layers_with_reprojected_clones,
@@ -145,6 +145,13 @@ def pytest_configure(config: "Config") -> None:
     _start_and_configure_qgis_app(config)
 
 
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_teardown(item: pytest.Item, nextitem: Optional[pytest.Item]) -> None:
+    request = item.funcargs.get("request")
+    if request:
+        ensure_qgis_layer_fixtures_are_cleaned(request)
+
+
 @pytest.fixture(autouse=True, scope="session")
 def qgis_app(request: "SubRequest") -> QgsApplication:
     yield _APP if not request.config._plugin_settings.qgis_init_disabled else None
@@ -227,7 +234,6 @@ def qgis_world_map_geopackage(tmp_path: Path) -> Path:
 
 
 @pytest.fixture()
-@clean_qgis_layer
 def qgis_countries_layer(qgis_world_map_geopackage: Path) -> QgsVectorLayer:
     """
     Natural Earth countries as a QgsVectorLayer.

@@ -16,10 +16,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 #
+import warnings
 from collections import Counter
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
 from osgeo import gdal
 from qgis.core import (
@@ -36,9 +37,13 @@ from qgis.core import (
 )
 from qgis.PyQt import sip
 
+if TYPE_CHECKING:
+    from _pytest.fixtures import FixtureRequest
+
 DEFAULT_RASTER_FORMAT = "tif"
 
 DEFAULT_CRS = QgsCoordinateReferenceSystem("EPSG:4326")
+LAYER_KEYWORDS = ("layer", "lyr", "raster", "rast", "tif")
 
 
 def get_common_extent_from_all_layers() -> Optional[QgsRectangle]:
@@ -178,18 +183,52 @@ def clean_qgis_layer(fn: Callable) -> Callable:
     Sometimes fixture non-memory layers that are used but not added
     to the project might cause segmentation fault errors.
     """
+    warnings.warn(
+        "clean_qgis_layer decorator will be deprecated. "
+        "Rename fixtures to contain some of the following keywords: "
+        f"\"{', '.join(LAYER_KEYWORDS)}\" and they should be "
+        "cleaned automatically by pytest_runtest_teardown hook.",
+        PendingDeprecationWarning,
+        stacklevel=2,
+    )
 
     @wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> QgsMapLayer:
         layer: QgsMapLayer = fn(*args, **kwargs)
         yield layer
-
-        if (
-            isinstance(layer, QgsMapLayer)
-            and not sip.isdeleted(layer)
-            and layer.id() not in QgsProject.instance().mapLayers(True).keys()
-        ):
-            QgsProject.instance().addMapLayer(layer)
-            QgsProject.instance().removeMapLayer(layer)
+        _set_layer_owner_to_project(layer)
 
     return wrapper
+
+
+def ensure_qgis_layer_fixtures_are_cleaned(request: "FixtureRequest") -> None:
+    """
+    Sometimes fixture non-memory layers that are used but not added
+    to the project might cause segmentation fault errors.
+
+    This function ensures that the layer fixtures will be cleaned by
+    adding and removing those into the project.
+
+    It does not matter what scoped the fixtures are since the
+    layers are not actually deleted at any point.
+    """
+    for fixture_name in request.fixturenames:
+        if any(
+            possible_layer_name in fixture_name.lower()
+            for possible_layer_name in LAYER_KEYWORDS
+        ):
+            try:
+                layer = request.getfixturevalue(fixture_name)
+            except AssertionError:
+                continue
+            _set_layer_owner_to_project(layer)
+
+
+def _set_layer_owner_to_project(layer: Any) -> None:
+    if (
+        isinstance(layer, QgsMapLayer)
+        and not sip.isdeleted(layer)
+        and layer.id() not in QgsProject.instance().mapLayers(True).keys()
+    ):
+        QgsProject.instance().addMapLayer(layer)
+        QgsProject.instance().removeMapLayer(layer)
