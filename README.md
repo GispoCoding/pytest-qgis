@@ -50,24 +50,6 @@ Check the marker api [documentation](https://docs.pytest.org/en/latest/mark.html
 and [examples](https://docs.pytest.org/en/latest/example/markers.html#marking-whole-classes-or-modules) for the ways
 markers can be used.
 
-### Utility tools
-
-* `clean_qgis_layer` decorator found in `pytest_qgis.utils` is a decorator which can be used with `QgsMapLayer` fixtures
-  to ensure that they are cleaned properly if they are used but not added to the `QgsProject`. This is only needed with
-  layers with other than memory provider.
-   ```python
-   # conftest.py or start of a test file
-   import pytest
-   from pytest_qgis.utils import clean_qgis_layer
-   from qgis.core import QgsVectorLayer
-
-   @pytest.fixture()
-   @clean_qgis_layer
-   def some_layer() -> QgsVectorLayer:
-     return QgsVectorLayer("layer_file.geojson", "some layer")
-
-   ```
-
 ### Hooks
 
 * `pytest_configure` hook is used to initialize and
@@ -75,6 +57,8 @@ markers can be used.
   used to patch `qgis.utils.iface` with `qgis_iface` automatically.
 
   > Be careful not to import modules importing `qgis.utils.iface` in the root of conftest, because the `pytest_configure` hook has not yet patched `iface` in that point. See [this issue](https://github.com/GispoCoding/pytest-qgis/issues/35) for details.
+
+* `pytest_runtest_teardown` hook is used to ensure that all layer fixtures of any scope are cleaned properly without causing segmentation faults. The layer fixtures that are cleaned automatically must have some of the following keywords in their name: "layer", "lyr", "raster", "rast", "tif".
 
 ### Command line options
 
