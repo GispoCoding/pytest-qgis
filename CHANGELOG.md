@@ -1,3 +1,6 @@
+# Unreleased
+* [#46] Use session scope in qgis_bot fixture
+* [#45] Clean map layers automatically
 
 # Version 1.3.5 (30-06-2023)
 * [#34](https://github.com/GispoCoding/pytest-qgis/pull/34) Use tempfile instead of protected TempPathFactory in QGIS config path creation
