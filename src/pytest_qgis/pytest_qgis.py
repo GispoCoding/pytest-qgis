@@ -241,7 +241,7 @@ def qgis_countries_layer(qgis_world_map_geopackage: Path) -> QgsVectorLayer:
     return _get_countries_layer(qgis_world_map_geopackage)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def qgis_bot(qgis_iface: QgisInterface) -> QgisBot:
     """
     Object that holds common utility methods for interacting with QGIS.
@@ -254,6 +254,11 @@ def module_qgis_bot(qgis_iface: QgisInterface) -> QgisBot:
     """
     Object that holds common utility methods for interacting with QGIS.
     """
+    warnings.warn(
+        "module_qgis_bot fixture will be deprecated. " "Use qgis_bot instead.",
+        PendingDeprecationWarning,
+        stacklevel=2,
+    )
     return QgisBot(qgis_iface)
 
 
