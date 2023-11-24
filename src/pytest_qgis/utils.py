@@ -16,6 +16,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 #
+import time
 import warnings
 from collections import Counter
 from functools import wraps
@@ -36,6 +37,7 @@ from qgis.core import (
     QgsVectorLayer,
 )
 from qgis.PyQt import sip
+from qgis.PyQt.QtCore import QCoreApplication
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
@@ -237,3 +239,11 @@ def _set_layer_owner_to_project(layer: Any) -> None:
     ):
         QgsProject.instance().addMapLayer(layer)
         QgsProject.instance().removeMapLayer(layer)
+
+
+def wait(wait_time_milliseconds: int = 0) -> None:
+    """Waits for wait_time ms."""
+    start = time.time()
+
+    while (time.time() - start) * 1000 < wait_time_milliseconds:
+        QCoreApplication.processEvents()

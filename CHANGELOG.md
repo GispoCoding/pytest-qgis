@@ -1,4 +1,5 @@
 # Unreleased
+* [#48] Add possibility to raise errors if there are warnings or errors in attribute form when adding feature
 * [#46] Use session scope in qgis_bot fixture
 * [#45] Clean map layers automatically
 

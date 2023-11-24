@@ -20,6 +20,7 @@ from typing import Any, Dict, Optional, Union
 
 from qgis.core import (
     QgsFeature,
+    QgsFieldConstraints,
     QgsGeometry,
     QgsVectorDataProvider,
     QgsVectorLayer,
@@ -27,6 +28,8 @@ from qgis.core import (
 )
 from qgis.gui import QgisInterface, QgsAttributeDialog, QgsAttributeEditorContext
 from qgis.PyQt.QtWidgets import QLabel, QWidget
+
+from pytest_qgis import utils
 
 
 class QgisBot:
@@ -46,12 +49,27 @@ class QgisBot:
         layer: QgsVectorLayer,
         geometry: QgsGeometry,
         attributes: Optional[Dict[str, Any]] = None,
+        raise_from_warnings: bool = False,
+        raise_from_errors: bool = True,
+        show_dialog_timeout_milliseconds: int = 0,
     ) -> QgsFeature:
         """
         Create test feature with default values using QgsAttributeDialog.
         This ensures that all the default values are honored and
         for example boolean fields are either true or false, not null.
+
+        :param layer: QgsVectorLayer to create feature into
+        :param geometry: QgsGeometry of the feature
+        :param attributes: attributes as a dictionary
+        :param raise_from_warnings: Whether to raise error if there are non-enforcing
+            constraint warnings with attribute values.
+        :param raise_from_errors: Whether to raise error if there are enforcing
+            constraint errors with attribute values.
+        :param show_dialog_timeout_milliseconds: Shows attribute dialog. Useful for
+            debugging.
+        :return: Created QgsFeature that can be added to the layer.
         """
+
         initial_ids = set(layer.allFeatureIds())
 
         capabilities = layer.dataProvider().capabilities()
@@ -75,15 +93,49 @@ class QgisBot:
 
         assert new_feature.isValid()
 
+        warnings = {}
+        errors = {}
+        for field_index, field in enumerate(layer.fields()):
+            no_warnings, warning_messages = QgsVectorLayerUtils.validateAttribute(
+                layer,
+                new_feature,
+                field_index,
+                QgsFieldConstraints.ConstraintStrengthSoft,
+            )
+            no_errors, error_messages = QgsVectorLayerUtils.validateAttribute(
+                layer,
+                new_feature,
+                field_index,
+                QgsFieldConstraints.ConstraintStrengthHard,
+            )
+            if not no_warnings:
+                warnings[field.name()] = warning_messages
+            if not no_errors:
+                errors[field.name()] = error_messages
+
+        if raise_from_warnings and warnings:
+            raise ValueError(
+                "There are non-enforcing constraint warnings in the attribute form: "
+                f"{warnings!s}"
+            )
+        if raise_from_errors and errors:
+            raise ValueError(
+                "There are enforcing constraint errors in the attribute form: "
+                f"{errors!s}"
+            )
+
         context = QgsAttributeEditorContext()
         context.setMapCanvas(self._iface.mapCanvas())
 
         dialog = QgsAttributeDialog(
             layer, new_feature, False, self._iface.mainWindow(), True, context
         )
+        dialog.show()
         dialog.setMode(QgsAttributeEditorContext.AddFeatureMode)
 
-        # Two accepts to bypass some warnings
+        utils.wait(show_dialog_timeout_milliseconds)
+
+        # Two accepts to ignore warnings and errors
         dialog.accept()
         dialog.accept()
 
