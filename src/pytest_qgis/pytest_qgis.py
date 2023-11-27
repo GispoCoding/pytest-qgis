@@ -205,21 +205,6 @@ def qgis_new_project(qgis_iface: QgisInterface) -> None:  # noqa: QGS105
 
 
 @pytest.fixture()
-def new_project(qgis_iface: QgisInterface) -> None:  # noqa: QGS105
-    """
-    Initializes new QGIS project by removing layers and relations etc.
-
-    Deprecated: use qgis_new_project instead.
-    """
-    warnings.warn(
-        "new_project fixture will be deprecated. " "Use qgis_new_project instead.",
-        PendingDeprecationWarning,
-        stacklevel=2,
-    )
-    qgis_iface.newProject()
-
-
-@pytest.fixture()
 def qgis_world_map_geopackage(tmp_path: Path) -> Path:
     """
     Path to natural world map geopackage containing Natural Earth data.
@@ -246,19 +231,6 @@ def qgis_bot(qgis_iface: QgisInterface) -> QgisBot:
     """
     Object that holds common utility methods for interacting with QGIS.
     """
-    return QgisBot(qgis_iface)
-
-
-@pytest.fixture(scope="module")
-def module_qgis_bot(qgis_iface: QgisInterface) -> QgisBot:
-    """
-    Object that holds common utility methods for interacting with QGIS.
-    """
-    warnings.warn(
-        "module_qgis_bot fixture will be deprecated. " "Use qgis_bot instead.",
-        PendingDeprecationWarning,
-        stacklevel=2,
-    )
     return QgisBot(qgis_iface)
 
 

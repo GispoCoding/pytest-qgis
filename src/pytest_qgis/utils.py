@@ -17,11 +17,9 @@
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 #
 import time
-import warnings
 from collections import Counter
-from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, List, Optional
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from osgeo import gdal
 from qgis.core import (
@@ -181,31 +179,6 @@ def copy_layer_style_and_position(
     ]
 
     group.insertLayer(index + 1, layer2)
-
-
-def clean_qgis_layer(fn: Callable) -> Callable:
-    """
-    Decorator to ensure that the QGIS layer (fixture) is cleaned properly.
-
-    Sometimes fixture non-memory layers that are used but not added
-    to the project might cause segmentation fault errors.
-    """
-    warnings.warn(
-        "clean_qgis_layer decorator will be deprecated. "
-        "Rename fixtures to contain some of the following keywords: "
-        f"\"{', '.join(LAYER_KEYWORDS)}\" and they should be "
-        "cleaned automatically by pytest_runtest_teardown hook.",
-        PendingDeprecationWarning,
-        stacklevel=2,
-    )
-
-    @wraps(fn)
-    def wrapper(*args: Any, **kwargs: Any) -> QgsMapLayer:
-        layer: QgsMapLayer = fn(*args, **kwargs)
-        yield layer
-        _set_layer_owner_to_project(layer)
-
-    return wrapper
 
 
 def ensure_qgis_layer_fixtures_are_cleaned(request: "FixtureRequest") -> None:
