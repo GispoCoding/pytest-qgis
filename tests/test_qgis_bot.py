@@ -16,13 +16,21 @@
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 #
+from typing import TYPE_CHECKING
+
 import pytest
 from qgis.core import QgsFieldConstraints, QgsGeometry
 from qgis.gui import QgsAttributeDialog
 
+if TYPE_CHECKING:
+    from qgis.core import QgsVectorLayer
+    from qgis.gui import QgisInterface
+
+    from pytest_qgis.qgis_bot import QgisBot
+
 
 @pytest.fixture()
-def layer_with_soft_constraint(layer_points):
+def layer_with_soft_constraint(layer_points: "QgsVectorLayer") -> "QgsVectorLayer":
     """setup the layer"""
     # Set not-null constraint with SOFT strength
     fields = layer_points.fields()
@@ -39,7 +47,7 @@ def layer_with_soft_constraint(layer_points):
 
 
 @pytest.fixture()
-def layer_with_hard_constraint(layer_points):
+def layer_with_hard_constraint(layer_points: "QgsVectorLayer") -> "QgsVectorLayer":
     """setup the layer"""
     # Set not-null constraint with SOFT strength
     fields = layer_points.fields()
@@ -55,69 +63,63 @@ def layer_with_hard_constraint(layer_points):
     return layer_points
 
 
-class TestFeatureCreationWhenNotRaisingFromSoftBreaks:
-    @pytest.fixture()
-    def layer(self, layer_with_soft_constraint):
-        self.count_before = layer_with_soft_constraint.featureCount()
-        return layer_with_soft_constraint
+def test_feature_gets_created_with_check_box_false_when_not_raising_from_warnings(
+    layer_with_soft_constraint: "QgsVectorLayer", qgis_bot: "QgisBot"
+):
+    feature_count_before = layer_with_soft_constraint.featureCount()
+    feature = qgis_bot.create_feature_with_attribute_dialog(
+        layer_with_soft_constraint,
+        QgsGeometry.fromWkt("POINT(0,0)"),
+        raise_from_warnings=False,
+    )
 
-    @pytest.fixture()
-    def feature(self, layer, qgis_bot):
-        self.feature_count_before = layer.featureCount()
-        return qgis_bot.create_feature_with_attribute_dialog(
-            layer, QgsGeometry.fromWkt("POINT(0,0)"), raise_from_warnings=False
+    assert layer_with_soft_constraint.featureCount() == feature_count_before + 1
+
+    # With normal way of creating, it would be NULL.
+    assert feature["bool_field"] is False
+
+
+def test_should_raise_valueerror_on_soft_constraint_break_when_asked(
+    layer_with_soft_constraint: "QgsVectorLayer", qgis_bot: "QgisBot"
+):
+    with pytest.raises(ValueError, match="value is NULL"):
+        qgis_bot.create_feature_with_attribute_dialog(
+            layer_with_soft_constraint,
+            QgsGeometry.fromWkt("POINT(0,0)"),
+            raise_from_warnings=True,
         )
 
-    def test_feature_gets_created(self, layer, feature):
-        assert layer.featureCount() == self.count_before + 1
 
-    def test_default_values_should_be_assigned(self, feature):
-        # With normal way of creating, it would be NULL.
-        assert feature["bool_field"] is False
+def test_feature_gets_created_with_check_box_false_when_not_raising_from_errors(
+    layer_with_hard_constraint: "QgsVectorLayer", qgis_bot: "QgisBot"
+):
+    feature_count_before = layer_with_hard_constraint.featureCount()
+    feature = qgis_bot.create_feature_with_attribute_dialog(
+        layer_with_hard_constraint,
+        QgsGeometry.fromWkt("POINT(0,0)"),
+        raise_from_errors=False,
+    )
 
-    def test_should_raise_valueerror_on_soft_constraint_break_when_asked(
-        self, layer, qgis_bot
-    ):
-        with pytest.raises(ValueError, match="value is NULL"):
-            qgis_bot.create_feature_with_attribute_dialog(
-                layer,
-                QgsGeometry.fromWkt("POINT(0,0)"),
-                raise_from_warnings=True,
-            )
+    assert layer_with_hard_constraint.featureCount() == feature_count_before + 1
+
+    # With normal way of creating, it would be NULL.
+    assert feature["bool_field"] is False
 
 
-class TestFeatureCreationWhenNotRaisingFromHardBreaks:
-    @pytest.fixture()
-    def layer(self, layer_with_hard_constraint):
-        self.count_before = layer_with_hard_constraint.featureCount()
-        return layer_with_hard_constraint
-
-    @pytest.fixture()
-    def feature(self, layer, qgis_bot):
-        self.feature_count_before = layer.featureCount()
-        return qgis_bot.create_feature_with_attribute_dialog(
-            layer, QgsGeometry.fromWkt("POINT(0,0)"), raise_from_errors=False
+def test_should_raise_valueerror_on_hard_constraint_break_when_asked(
+    layer_with_hard_constraint: "QgsVectorLayer", qgis_bot: "QgisBot"
+):
+    with pytest.raises(ValueError, match="value is NULL"):
+        qgis_bot.create_feature_with_attribute_dialog(
+            layer_with_hard_constraint,
+            QgsGeometry.fromWkt("POINT(0,0)"),
+            raise_from_errors=True,
         )
 
-    def test_feature_gets_created(self, layer, feature):
-        assert layer.featureCount() == self.count_before + 1
 
-    def test_default_values_should_be_assigned(self, feature):
-        # With normal way of creating, it would be NULL.
-        assert feature["bool_field"] is False
-
-    def test_should_raise_valueerror_on_hard_constraint_break_when_asked(
-        self, layer, qgis_bot
-    ):
-        with pytest.raises(ValueError, match="value is NULL"):
-            qgis_bot.create_feature_with_attribute_dialog(
-                layer,
-                QgsGeometry.fromWkt("POINT(0,0)"),
-                raise_from_errors=True,
-            )
-
-
-def test_create_simple_feature_with_attribute_dialog(layer_points, qgis_bot):
+def test_create_simple_feature_with_attribute_dialog(
+    layer_points: "QgsVectorLayer", qgis_bot: "QgisBot"
+):
     layer = layer_points
     count = layer.featureCount()
 
@@ -129,7 +131,9 @@ def test_create_simple_feature_with_attribute_dialog(layer_points, qgis_bot):
     assert feat["bool_field"] is False
 
 
-def test_get_qgs_attribute_dialog_widgets_by_name(qgis_iface, layer_points, qgis_bot):
+def test_get_qgs_attribute_dialog_widgets_by_name(
+    qgis_iface: "QgisInterface", layer_points: "QgsVectorLayer", qgis_bot: "QgisBot"
+):
     dialog = QgsAttributeDialog(
         layer_points,
         layer_points.getFeature(1),
