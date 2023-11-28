@@ -1,6 +1,9 @@
 -c requirements.txt
 -e file:.
 
+# Managing dependencies
+pip-tools
+
 # testing
 pytest-cov
 pytest-qt==3.3.0
