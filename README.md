@@ -95,10 +95,19 @@ pip install pytest-qgis
 
 ## Development environment
 
-1. Create a virtual environment and activate it.
-2. `pip install pip-tools`
-3. `pip-sync requirements.txt requirements-dev.txt`
-4. `pre-commit install`
+```shell
+# Create a virtual environment with qgis and dependencies available
+$ python -m venv .venv --system-site-packages
+# Activate the virtual environment
+$ source .venv/bin/activate
+# Update pip and setuptools
+$ python -m pip install -U pip setuptools
+$ pip install pip-tools
+# Install dependencies
+$ pip-sync requirements.txt requirements-dev.txt
+# Install pre-commit hooks
+$ pre-commit install
+```
 
 ### Updating dependencies
 

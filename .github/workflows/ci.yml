@@ -19,15 +19,15 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install dependencies
         run: |
-          pip3 install -U pip
+          python3 -m pip install -U pip setuptools
           pip3 install -qr requirements.txt pytest-cov
           pip3 install -e .
       - name: Run tests
+        env:
+          QGIS_IN_CI: 1
         run: >
           xvfb-run -s '+extension GLX -screen 0 1024x768x24'
           pytest -v --cov src/pytest_qgis --cov-report=xml -m 'not with_pytest_qt' -p no:pytest-qt tests
-        env:
-          QGIS_IN_CI: 1
 
       # Upload coverage report. Will not work if the repo is private
       - name: Upload coverage to Codecov
