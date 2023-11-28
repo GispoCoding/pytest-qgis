@@ -1,10 +1,6 @@
 -c requirements.txt
 -e file:.
 
-# packaging
-twine
-wheel
-
 # testing
 pytest-cov
 pytest-qt==3.3.0
