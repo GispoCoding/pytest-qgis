@@ -1,0 +1,14 @@
+[flake8]
+max_line_length = 88
+per-file-ignores =
+    src/pytest_qgis/pytest_qgis.py:QGS105
+    src/pytest_qgis/qgis_interface.py:N802,N803
+    tests/*:ANN001,ANN201
+extend-ignore =
+            # whitespace before ':'
+            E203,
+            # Missing type annotation for self in method
+            ANN101,
+            # fixture '{name}' does not return anything, add leading underscore
+            PT004
+ban-relative-imports = true
