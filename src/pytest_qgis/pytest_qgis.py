@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #  Copyright (C) 2021-2023 pytest-qgis Contributors.
 #
 #
@@ -54,6 +52,8 @@ if TYPE_CHECKING:
     from _pytest.config.argparsing import Parser
     from _pytest.fixtures import SubRequest
     from _pytest.mark import Mark
+
+QGIS_3_18 = 31800
 
 Settings = namedtuple(
     "Settings", ["gui_enabled", "qgis_init_disabled", "canvas_width", "canvas_height"]
@@ -146,7 +146,7 @@ def pytest_configure(config: "Config") -> None:
 
 
 @pytest.hookimpl(tryfirst=True)
-def pytest_runtest_teardown(item: pytest.Item, nextitem: Optional[pytest.Item]) -> None:
+def pytest_runtest_teardown(item: pytest.Item, nextitem: Optional[pytest.Item]) -> None:  # noqa: ARG001
     request = item.funcargs.get("request")
     if request:
         ensure_qgis_layer_fixtures_are_cleaned(request)
@@ -168,12 +168,13 @@ def qgis_app(request: "SubRequest") -> QgsApplication:
 
 
 @pytest.fixture(scope="session")
-def qgis_parent(qgis_app: QgsApplication) -> QWidget:
+def qgis_parent(qgis_app: QgsApplication) -> QWidget:  # noqa: ARG001
     return _PARENT
 
 
 @pytest.fixture(scope="session")
 def qgis_canvas() -> QgsMapCanvas:
+    assert _CANVAS
     return _CANVAS
 
 
@@ -185,6 +186,7 @@ def qgis_version() -> int:
 
 @pytest.fixture(scope="session")
 def qgis_iface() -> QgisInterfaceOrig:
+    assert _IFACE
     return _IFACE
 
 
@@ -197,7 +199,7 @@ def qgis_processing(qgis_app: QgsApplication) -> None:
 
 
 @pytest.fixture()
-def qgis_new_project(qgis_iface: QgisInterface) -> None:  # noqa: QGS105
+def qgis_new_project(qgis_iface: QgisInterface) -> None:
     """
     Initializes new QGIS project by removing layers and relations etc.
     """
@@ -246,7 +248,7 @@ def qgis_show_map(
     Shows QGIS map if qgis_show_map marker is used.
     """
     show_map_marker = request.node.get_closest_marker(SHOW_MAP_MARKER)
-    common_settings: Settings = request.config._plugin_settings  # type: ignore
+    common_settings: Settings = request.config._plugin_settings
 
     if show_map_marker:
         # Assign the bridge to have correct layer order and visibilities
@@ -272,8 +274,8 @@ def qgis_show_map(
 
 
 def _start_and_configure_qgis_app(config: "Config") -> None:
-    global _APP, _CANVAS, _IFACE, _PARENT, _QGIS_CONFIG_PATH
-    settings: Settings = config._plugin_settings  # type: ignore
+    global _APP, _CANVAS, _IFACE, _PARENT, _QGIS_CONFIG_PATH  # noqa: PLW0603
+    settings: Settings = config._plugin_settings
 
     # Use temporary path for QGIS config
     _QGIS_CONFIG_PATH = Path(tempfile.mkdtemp(prefix="pytest-qgis"))
@@ -295,8 +297,9 @@ def _start_and_configure_qgis_app(config: "Config") -> None:
     # This only works with QGIS >= 3.18 since before that
     # importing qgis.utils causes RecursionErrors. See this issue for details
     # https://github.com/qgis/QGIS/issues/40564
-    if _QGIS_VERSION >= 31800:
-        from qgis.utils import iface  # noqa # This import is required
+
+    if _QGIS_VERSION >= QGIS_3_18:
+        from qgis.utils import iface  # noqa: F401 # This import is required
 
         mock.patch("qgis.utils.iface", _IFACE).start()
 
@@ -401,7 +404,7 @@ def _parse_settings(config: "Config") -> Settings:
     return Settings(gui_enabled, qgis_init_disabled, canvas_width, canvas_height)
 
 
-def _parse_show_map_marker(marker: "Mark") -> ShowMapSettings:
+def _parse_show_map_marker(marker: "Mark") -> ShowMapSettings:  # noqa: C901, PLR0912 TODO: Fix complexity
     timeout = add_basemap = zoom_to_common_extent = extent = notset = object()
 
     for kwarg, value in marker.kwargs.items():

@@ -92,7 +92,7 @@ def get_copied_gpkg(tmp_path: Path) -> Path:
 def get_gpkg_layer(
     name: str, gpkg: Path, crs: QgsCoordinateReferenceSystem = DEFAULT_CRS
 ) -> QgsVectorLayer:
-    layer = QgsVectorLayer(f"{str(gpkg)}|layername={name}", name, "ogr")
+    layer = QgsVectorLayer(f"{gpkg!s}|layername={name}", name, "ogr")
     layer.setProviderEncoding("utf-8")
     assert layer.isValid()
     if not layer.crs().isValid():

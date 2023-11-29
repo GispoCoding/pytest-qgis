@@ -15,7 +15,6 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
-from typing import TYPE_CHECKING
 
 import pytest
 from qgis.core import Qgis, QgsProcessing, QgsProject, QgsVectorLayer
@@ -24,8 +23,7 @@ from qgis.utils import iface
 
 from tests.utils import QGIS_VERSION
 
-if TYPE_CHECKING:
-    pass
+QGIS_3_18 = 31800
 
 # DO not use this directly, this is only meant to be used with
 # replace_iface_with_qgis_iface fixture
@@ -34,7 +32,7 @@ __iface = None
 
 @pytest.fixture()
 def replace_iface_with_qgis_iface(qgis_iface):
-    global __iface
+    global __iface  # noqa: PLW0603
     __iface = qgis_iface
 
 
@@ -88,7 +86,7 @@ def test_processing_run(qgis_processing):
 
 
 @pytest.mark.skipif(
-    QGIS_VERSION < 31800, reason="https://github.com/qgis/QGIS/issues/40564"
+    QGIS_VERSION < QGIS_3_18, reason="https://github.com/qgis/QGIS/issues/40564"
 )
 def test_setup_qgis_iface(qgis_iface):
     assert iface == qgis_iface

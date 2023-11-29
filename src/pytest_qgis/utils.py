@@ -204,11 +204,11 @@ def ensure_qgis_layer_fixtures_are_cleaned(request: "FixtureRequest") -> None:
             _set_layer_owner_to_project(layer)
 
 
-def _set_layer_owner_to_project(layer: Any) -> None:
+def _set_layer_owner_to_project(layer: Any) -> None:  # noqa: ANN401
     if (
         isinstance(layer, QgsMapLayer)
         and not sip.isdeleted(layer)
-        and layer.id() not in QgsProject.instance().mapLayers(True).keys()
+        and layer.id() not in QgsProject.instance().mapLayers(True)
     ):
         QgsProject.instance().addMapLayer(layer)
         QgsProject.instance().removeMapLayer(layer)
