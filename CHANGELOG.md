@@ -1,11 +1,29 @@
 # Unreleased
+
+# Version 2.0.0 (29-11-2023)
+
+## New Features
+
+* [#45](https://github.com/GispoCoding/pytest-qgis/pull/45) Clean map layers automatically.
+* [#48](https://github.com/GispoCoding/pytest-qgis/pull/48) Add possibility to raise errors if there are warnings or errors in attribute form when adding feature.
+
+## Fixes
+
+* [#45](https://github.com/GispoCoding/pytest-qgis/pull/45) Ensure that the projection is set when replacing layers with projected ones.
+
+## Maintenance tasks
+
+* [#51](https://github.com/GispoCoding/pytest-qgis/pull/51) Change linting to use Ruff.
+* [#50](https://github.com/GispoCoding/pytest-qgis/pull/50) Migrate to pyproject.toml and upgrade development dependencies.
+
+## API Breaks
+
 * [#47](https://github.com/GispoCoding/pytest-qgis/pull/48) Remove deprecated functionality:
-  * new_project fixture
-  * module_qgis_bot fixture
-  * clean_qgis_layer function
-* [#48](https://github.com/GispoCoding/pytest-qgis/pull/48) Add possibility to raise errors if there are warnings or errors in attribute form when adding feature
+  * `new_project()` fixture
+  * `module_qgis_bot()` fixture
+  * `clean_qgis_layer()` function
 * [#46](https://github.com/GispoCoding/pytest-qgis/pull/46) Use session scope in qgis_bot fixture
-* [#45](https://github.com/GispoCoding/pytest-qgis/pull/45) Clean map layers automatically
+* [#48](https://github.com/GispoCoding/pytest-qgis/pull/48) The `create_feature_with_attribute_dialog()` function now, by default, raises a ValueError when a created feature violates enforced attribute constraints.
 
 # Version 1.3.5 (30-06-2023)
 * [#34](https://github.com/GispoCoding/pytest-qgis/pull/34) Use tempfile instead of protected TempPathFactory in QGIS config path creation
