@@ -58,7 +58,9 @@ pytest_qgis = ["py.typed"]
 
 [tool.pytest.ini_options]
 doctest_encoding = "utf-8"
-
+markers = [
+    "with_pytest_qt: these tests require pytest-qt (deselect with '-m \"with_pytest_qt\"')"
+]
 
 [tool.isort]
 profile = "black"
