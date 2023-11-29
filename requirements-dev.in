@@ -10,6 +10,9 @@ pytest
 pytest-cov
 pytest-qt==3.3.0
 
+# typing
+PyQt5-stubs
+
 # for linting checks at commit time
 pre-commit
 
