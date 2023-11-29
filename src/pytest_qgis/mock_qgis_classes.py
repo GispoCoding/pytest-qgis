@@ -40,7 +40,11 @@ class MockMessageBar(QObject):
         return self.messages[level]
 
     def pushMessage(  # noqa: N802
-        self, title: str, text: str, level: int, duration: int
+        self,
+        title: str,
+        text: str,
+        level: int,
+        duration: int,  # noqa: ARG002
     ) -> None:
         """A mocked method for pushing a message to the bar."""
         msg = f"{title}:{text}"

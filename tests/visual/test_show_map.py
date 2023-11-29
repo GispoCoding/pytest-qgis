@@ -32,6 +32,9 @@ In that case, run these tests with pytest-qt disabled: "pytest -p no:pytest-qt"
 
 DEFAULT_TIMEOUT = 0.01 if IN_CI else 1
 
+QGIS_3_12 = 31200
+QGIS_3_18 = 31800
+
 
 @pytest.fixture(autouse=True)
 def setup(qgis_new_project):
@@ -61,58 +64,63 @@ def test_show_map_with_basemap(layer_polygon):
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT)
 @pytest.mark.skipif(
-    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+    QGIS_VERSION < QGIS_3_12,
+    reason="QGIS 3.10 test image cannot find correct algorithms",
 )
 def test_show_map_crs_change_to_3067(
     layer_polygon, layer_polygon_3067, raster_3067, qgis_version
 ):
     layer_polygon_3067.setOpacity(0.3)
-    if qgis_version > 31800:
+    if qgis_version > QGIS_3_18:
         raster_3067.setOpacity(0.9)
     QgsProject.instance().addMapLayers([layer_polygon, layer_polygon_3067, raster_3067])
 
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT)
 @pytest.mark.skipif(
-    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+    QGIS_VERSION < QGIS_3_12,
+    reason="QGIS 3.10 test image cannot find correct algorithms",
 )
 def test_show_map_crs_change_to_3067_with_different_layer_order(
     layer_polygon, layer_polygon_3067, raster_3067, qgis_version
 ):
     layer_polygon_3067.setOpacity(0.3)
-    if qgis_version > 31800:
+    if qgis_version > QGIS_3_18:
         raster_3067.setOpacity(0.9)
     QgsProject.instance().addMapLayers([raster_3067, layer_polygon_3067, layer_polygon])
 
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT, add_basemap=True)
 @pytest.mark.skipif(
-    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+    QGIS_VERSION < QGIS_3_12,
+    reason="QGIS 3.10 test image cannot find correct algorithms",
 )
 def test_show_map_crs_change_to_3067_with_basemap(
     layer_polygon, layer_polygon_3067, raster_3067, qgis_version
 ):
     layer_polygon_3067.setOpacity(0.3)
-    if qgis_version > 31800:
+    if qgis_version > QGIS_3_18:
         raster_3067.setOpacity(0.9)
     QgsProject.instance().addMapLayers([layer_polygon, layer_polygon_3067, raster_3067])
 
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT)
 @pytest.mark.skipif(
-    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+    QGIS_VERSION < QGIS_3_12,
+    reason="QGIS 3.10 test image cannot find correct algorithms",
 )
 def test_show_map_crs_change_to_4326(
     layer_polygon, raster_3067, layer_points, qgis_version
 ):
-    if qgis_version > 31800:
+    if qgis_version > QGIS_3_18:
         raster_3067.setOpacity(0.9)
     QgsProject.instance().addMapLayers([layer_points, layer_polygon, raster_3067])
 
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT)
 @pytest.mark.skipif(
-    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+    QGIS_VERSION < QGIS_3_12,
+    reason="QGIS 3.10 test image cannot find correct algorithms",
 )
 def test_show_map_crs_change_to_4326_2(layer_polygon, layer_points, layer_polygon_3067):
     QgsProject.instance().addMapLayers(

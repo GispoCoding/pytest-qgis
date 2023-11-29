@@ -44,7 +44,7 @@ class QgisBot:
     ) -> None:
         self._iface = iface
 
-    def create_feature_with_attribute_dialog(
+    def create_feature_with_attribute_dialog(  # noqa: PLR0913
         self,
         layer: QgsVectorLayer,
         geometry: QgsGeometry,

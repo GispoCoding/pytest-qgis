@@ -23,10 +23,9 @@ from qgis.core import QgsFieldConstraints, QgsGeometry
 from qgis.gui import QgsAttributeDialog
 
 if TYPE_CHECKING:
+    from pytest_qgis.qgis_bot import QgisBot
     from qgis.core import QgsVectorLayer
     from qgis.gui import QgisInterface
-
-    from pytest_qgis.qgis_bot import QgisBot
 
 
 @pytest.fixture()

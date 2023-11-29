@@ -17,15 +17,17 @@
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-from qgis.core import QgsProject
-
 from pytest_qgis.utils import (
     get_common_extent_from_all_layers,
     get_layers_with_different_crs,
     replace_layers_with_reprojected_clones,
     set_map_crs_based_on_layers,
 )
+from qgis.core import QgsProject
+
 from tests.utils import DEFAULT_CRS, EPSG_3067, EPSG_4326, QGIS_VERSION
+
+QGIS_3_12 = 31200
 
 
 @pytest.fixture()
@@ -39,7 +41,8 @@ def layers_added(qgis_new_project, layer_polygon, layer_polygon_3067, raster_306
 
 
 @pytest.mark.skipif(
-    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+    QGIS_VERSION < QGIS_3_12,
+    reason="QGIS 3.10 test image cannot find correct algorithms",
 )
 def test_get_common_extent_from_all_layers(
     qgis_new_project, crs, layer_polygon, layer_polygon_3067
@@ -49,7 +52,8 @@ def test_get_common_extent_from_all_layers(
 
 
 @pytest.mark.skipif(
-    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+    QGIS_VERSION < QGIS_3_12,
+    reason="QGIS 3.10 test image cannot find correct algorithms",
 )
 def test_set_map_crs_based_on_layers_should_set_4326(qgis_new_project, layer_polygon):
     layer_polygon2 = layer_polygon.clone()
@@ -70,9 +74,10 @@ def test_get_layers_with_different_crs(
 
 
 @pytest.mark.skipif(
-    QGIS_VERSION < 31200, reason="QGIS 3.10 test image cannot find correct algorithms"
+    QGIS_VERSION < QGIS_3_12,
+    reason="QGIS 3.10 test image cannot find correct algorithms",
 )
-def test_replace_layers_with_reprojected_clones(
+def test_replace_layers_with_reprojected_clones(  # noqa: PLR0913
     crs, layers_added, qgis_processing, layer_polygon_3067, raster_3067, tmp_path
 ):
     vector_layer_id = layer_polygon_3067.id()

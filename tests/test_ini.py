@@ -16,8 +16,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 #
+
+from typing import TYPE_CHECKING
+
 import pytest
-from _pytest.pytester import Testdir
+
+if TYPE_CHECKING:
+    from _pytest.pytester import Testdir
 
 
 def test_ini_canvas(testdir: "Testdir"):
