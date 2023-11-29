@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
           python3 -m pip install -U pip setuptools
@@ -32,7 +32,7 @@ jobs:
       # Upload coverage report. Will not work if the repo is private
       - name: Upload coverage to Codecov
         if: ${{ matrix.qgis-tags == 'latest' && !github.event.repository.private }}
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
@@ -44,7 +44,7 @@ jobs:
   code-style:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
       - uses: pre-commit/action@v3.0.0
 
