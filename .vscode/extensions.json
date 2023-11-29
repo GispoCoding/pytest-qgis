@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "editorconfig.editorconfig",
+        "ms-python.flake8",
+        "charliermarsh.ruff",
+        "ms-python.python"
+    ]
+}
