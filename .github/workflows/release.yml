@@ -11,10 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: 3.9
+          cache: pip
 
       - name: Install dependencies
         run: |
@@ -42,7 +43,7 @@ jobs:
         contents: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download Artifact
         uses: actions/download-artifact@v3
         with:
