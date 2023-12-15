@@ -1,5 +1,9 @@
 # Unreleased
 
+## Fixes
+
+* Allow using MagicMocks to mock layers without problems
+
 # Version 2.0.0 (29-11-2023)
 
 ## New Features
