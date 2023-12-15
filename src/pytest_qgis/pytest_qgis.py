@@ -30,7 +30,6 @@ from unittest import mock
 
 import pytest
 from qgis.core import Qgis, QgsApplication, QgsProject, QgsRectangle, QgsVectorLayer
-from qgis.gui import QgisInterface as QgisInterfaceOrig
 from qgis.gui import QgsGui, QgsLayerTreeMapCanvasBridge, QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets, sip
 from qgis.PyQt.QtCore import QCoreApplication
@@ -185,7 +184,7 @@ def qgis_version() -> int:
 
 
 @pytest.fixture(scope="session")
-def qgis_iface() -> QgisInterfaceOrig:
+def qgis_iface() -> QgisInterface:
     assert _IFACE
     return _IFACE
 
