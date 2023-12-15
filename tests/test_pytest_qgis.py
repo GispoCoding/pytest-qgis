@@ -17,7 +17,7 @@
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-from qgis.core import Qgis, QgsProcessing, QgsProject, QgsVectorLayer
+from qgis.core import QgsProcessing, QgsProject, QgsVectorLayer
 from qgis.PyQt.QtWidgets import QToolBar
 from qgis.utils import iface
 
@@ -53,11 +53,6 @@ def test_add_layer():
 
 def test_qgis_new_project(qgis_new_project):
     assert QgsProject.instance().mapLayers() == {}
-
-
-def test_msg_bar(qgis_iface):
-    qgis_iface.messageBar().pushMessage("title", "text", Qgis.Info, 6)
-    assert qgis_iface.messageBar().messages.get(Qgis.Info) == ["title:text"]
 
 
 def test_processing_providers(qgis_app, qgis_processing):

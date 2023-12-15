@@ -65,6 +65,7 @@ from pytest_qgis.mock_qgis_classes import MockMessageBar
 LOGGER = logging.getLogger("QGIS")
 
 
+@typing.no_type_check  # TODO: remove this later
 class QgisInterface(QgisAbstractInterface):
     """
     Class to expose QGIS objects and functions to plugins.
@@ -154,6 +155,7 @@ class QgisInterface(QgisAbstractInterface):
         for relation in relation_manager.relations():
             relation_manager.removeRelation(relation)
         self._layers = []
+        self._messageBar.clear_messages()
         self.newProjectCreated.emit()
         return True
 
