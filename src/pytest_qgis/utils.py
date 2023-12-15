@@ -19,7 +19,8 @@
 import time
 from collections import Counter
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any, Optional
+from unittest.mock import MagicMock
 
 from osgeo import gdal
 from qgis.core import (
@@ -95,7 +96,7 @@ def transform_rectangle(
     return transform.transformBoundingBox(rectangle)
 
 
-def get_layers_with_different_crs() -> List[QgsMapLayer]:
+def get_layers_with_different_crs() -> list[QgsMapLayer]:
     map_crs = QgsProject.instance().crs()
     return [
         layer
@@ -105,7 +106,7 @@ def get_layers_with_different_crs() -> List[QgsMapLayer]:
 
 
 def replace_layers_with_reprojected_clones(
-    layers: List[QgsMapLayer], output_path: Path
+    layers: list[QgsMapLayer], output_path: Path
 ) -> None:
     """
     For some reason all layers having differing crs from the project are invisible.
@@ -207,6 +208,7 @@ def ensure_qgis_layer_fixtures_are_cleaned(request: "FixtureRequest") -> None:
 def _set_layer_owner_to_project(layer: Any) -> None:  # noqa: ANN401
     if (
         isinstance(layer, QgsMapLayer)
+        and not isinstance(layer, MagicMock)
         and not sip.isdeleted(layer)
         and layer.id() not in QgsProject.instance().mapLayers(True)
     ):

@@ -15,8 +15,10 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with pytest-qgis.  If not, see <https://www.gnu.org/licenses/>.
+from unittest.mock import MagicMock
 
-from qgis.core import QgsMapLayer, QgsProject
+import pytest
+from qgis.core import QgsMapLayer, QgsProject, QgsVectorLayer
 
 """
 Tests in this module will cause Segmentation fault error if
@@ -25,6 +27,14 @@ non-memory layer is not cleaned properly.
 Tests are not parametrized since the problem cannot be observed with
 parametrized tests.
 """
+
+
+@pytest.fixture()
+def stub_layer() -> MagicMock:
+    return MagicMock(
+        spec=QgsVectorLayer,
+        autospec=True,
+    )
 
 
 def test_layer_fixture_should_be_cleaned(layer_polygon_function):
@@ -58,3 +68,7 @@ def test_raster_layer_fixture_should_be_cleaned(raster_3067):
 def _test(layer: QgsMapLayer) -> None:
     # Check that the layer is not in the project
     assert not QgsProject.instance().mapLayer(layer.id())
+
+
+def test_mocked_layer_should_not_mess_with_cleaning_layers(stub_layer):
+    assert isinstance(stub_layer, QgsVectorLayer)
