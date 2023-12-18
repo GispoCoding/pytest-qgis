@@ -6,6 +6,29 @@ on:
     branches: [ main ]
 
 jobs:
+  temp_tests:
+    runs-on: ubuntu-latest
+    container:
+      image: qgis/qgis:${{ matrix.qgis-tags }}
+    strategy:
+      matrix:
+        qgis-tags: [ release-3_28, release-3_30, release-3_32, release-3_34, latest ]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          python3 -m pip install -U pip
+          pip3 install -q pytest
+      - name: Run tests
+        env:
+          QGIS_IN_CI: 1
+        run: >
+          xvfb-run -s '+extension GLX -screen 0 1024x768x24'
+          pytest -v -p no:qgis tests/test_crs.py
+
+
   tests:
     runs-on: ubuntu-latest
     container:
