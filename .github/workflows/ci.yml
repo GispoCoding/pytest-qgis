@@ -17,65 +17,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Run tests with unittest
+        env:
+          QGIS_IN_CI: 1
+        run: >
+          xvfb-run -s '+extension GLX -screen 0 1024x768x24'
+          python3 -m unittest tests/test_crs.py
       - name: Install dependencies
         run: |
           python3 -m pip install -U pip
           pip3 install -q pytest
-      - name: Run tests
+      - name: Run tests with pytest
         env:
           QGIS_IN_CI: 1
         run: >
           xvfb-run -s '+extension GLX -screen 0 1024x768x24'
           pytest -v -p no:qgis tests/test_crs.py
 
-
-  tests:
-    runs-on: ubuntu-latest
-    container:
-      image: qgis/qgis:${{ matrix.qgis-tags }}
-    strategy:
-      matrix:
-        qgis-tags: [ release-3_28, release-3_34, latest ]
-      fail-fast: false
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: |
-          python3 -m pip install -U pip setuptools
-          pip3 install -qr requirements.txt pytest-cov
-          pip3 install -e .
-      - name: Run tests
-        env:
-          QGIS_IN_CI: 1
-        run: >
-          xvfb-run -s '+extension GLX -screen 0 1024x768x24'
-          pytest -v --cov src/pytest_qgis --cov-report=xml -m 'not with_pytest_qt' -p no:pytest-qt tests
-
-      # Upload coverage report. Will not work if the repo is private
-      - name: Upload coverage to Codecov
-        if: ${{ matrix.qgis-tags == 'latest' && !github.event.repository.private }}
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          flags: pytest
-          fail_ci_if_error: false # set to true when upload is working
-          verbose: false
-
-
-  code-style:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-      - uses: pre-commit/action@v3.0.0
-
-#  changelog:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Run Changelog CI
-#        uses: saadmk11/changelog-ci@v1.0.0
-#        with:
-#          config_file: changelog-ci-config.json
+# Other jobs removed to save bandwidth during investigation
