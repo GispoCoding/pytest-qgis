@@ -1,5 +1,9 @@
 # Unreleased
 
+## Fixes
+
+* Make stub QgisInterface and MockMessageBar inherit real interfaces
+
 # Version 2.0.0 (29-11-2023)
 
 ## New Features
