@@ -27,7 +27,7 @@ jobs:
           QGIS_IN_CI: 1
         run: >
           xvfb-run -s '+extension GLX -screen 0 1024x768x24'
-          pytest -v --cov src/pytest_qgis --cov-report=xml -m 'not with_pytest_qt' -p no:pytest-qt tests
+          python3 -m pytest -v --cov src/pytest_qgis --cov-report=xml -m 'not with_pytest_qt' -p no:pytest-qt tests
 
       # Upload coverage report. Will not work if the repo is private
       - name: Upload coverage to Codecov
