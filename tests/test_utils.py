@@ -23,16 +23,16 @@ from pytest_qgis.utils import (
     replace_layers_with_reprojected_clones,
     set_map_crs_based_on_layers,
 )
-from qgis.core import QgsProject
+from qgis.core import QgsCoordinateReferenceSystem, QgsProject
 
-from tests.utils import DEFAULT_CRS, EPSG_3067, EPSG_4326, QGIS_VERSION
+from tests.utils import EPSG_3067, EPSG_4326, QGIS_VERSION
 
 QGIS_3_12 = 31200
 
 
 @pytest.fixture()
 def crs():
-    QgsProject.instance().setCrs(DEFAULT_CRS)
+    QgsProject.instance().setCrs(QgsCoordinateReferenceSystem(EPSG_4326))
 
 
 @pytest.fixture()

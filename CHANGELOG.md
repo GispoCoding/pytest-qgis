@@ -2,7 +2,8 @@
 
 ## Fixes
 
-* Allow using MagicMocks to mock layers without problems
+* [#55](https://github.com/GispoCoding/pytest-qgis/pull/55) Allows using MagicMocks to mock layers without problems
+* [#60](https://github.com/GispoCoding/pytest-qgis/pull/60) Allows using CRS properly again
 
 # Version 2.0.0 (29-11-2023)
 
