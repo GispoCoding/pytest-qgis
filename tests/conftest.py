@@ -19,9 +19,7 @@ import shutil
 from pathlib import Path
 
 import pytest
-from qgis.core import QgsCoordinateReferenceSystem, QgsRasterLayer, QgsVectorLayer
-
-from tests.utils import CRS_3067, DEFAULT_CRS
+from qgis.core import QgsRasterLayer, QgsVectorLayer
 
 pytest_plugins = "pytester"
 
@@ -65,7 +63,7 @@ def layer_polygon_session(gpkg_session: Path):
 
 @pytest.fixture()
 def layer_polygon_3067(gpkg: Path):
-    return get_gpkg_layer("polygon_3067", gpkg, CRS_3067)
+    return get_gpkg_layer("polygon_3067", gpkg)
 
 
 @pytest.fixture()
@@ -73,7 +71,6 @@ def raster_3067():
     return get_raster_layer(
         "small raster 3067",
         Path(Path(__file__).parent, "data", "small_raster.tif"),
-        CRS_3067,
     )
 
 
@@ -89,23 +86,15 @@ def get_copied_gpkg(tmp_path: Path) -> Path:
     return new_db_path
 
 
-def get_gpkg_layer(
-    name: str, gpkg: Path, crs: QgsCoordinateReferenceSystem = DEFAULT_CRS
-) -> QgsVectorLayer:
+def get_gpkg_layer(name: str, gpkg: Path) -> QgsVectorLayer:
     layer = QgsVectorLayer(f"{gpkg!s}|layername={name}", name, "ogr")
     layer.setProviderEncoding("utf-8")
     assert layer.isValid()
-    if not layer.crs().isValid():
-        layer.setCrs(crs)
     assert layer.crs().isValid()
     return layer
 
 
-def get_raster_layer(
-    name: str, path: Path, crs: QgsCoordinateReferenceSystem = DEFAULT_CRS
-) -> QgsRasterLayer:
+def get_raster_layer(name: str, path: Path) -> QgsRasterLayer:
     layer = QgsRasterLayer(str(path), name)
     assert layer.isValid()
-    if not layer.crs().isValid():
-        layer.setCrs(crs)
     return layer

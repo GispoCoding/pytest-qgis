@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 
 DEFAULT_RASTER_FORMAT = "tif"
 
-DEFAULT_CRS = QgsCoordinateReferenceSystem("EPSG:4326")
+DEFAULT_EPSG = "EPSG:4326"
 LAYER_KEYWORDS = ("layer", "lyr", "raster", "rast", "tif")
 
 
@@ -73,7 +73,7 @@ def set_map_crs_based_on_layers() -> None:
         crs_id, _ = crs_counter.most_common(1)[0]
         crs = QgsCoordinateReferenceSystem(crs_id)
     else:
-        crs = DEFAULT_CRS
+        crs = QgsCoordinateReferenceSystem(DEFAULT_EPSG)
     QgsProject.instance().setCrs(crs)
 
 
@@ -205,7 +205,7 @@ def ensure_qgis_layer_fixtures_are_cleaned(request: "FixtureRequest") -> None:
             _set_layer_owner_to_project(layer)
 
 
-def _set_layer_owner_to_project(layer: Any) -> None:  # noqa: ANN401
+def _set_layer_owner_to_project(layer: Any) -> None:
     if (
         isinstance(layer, QgsMapLayer)
         and not isinstance(layer, MagicMock)
