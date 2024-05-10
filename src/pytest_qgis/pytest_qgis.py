@@ -317,6 +317,11 @@ def _show_qgis_dlg(common_settings: Settings, qgis_parent: QWidget) -> None:
     if not common_settings.qgis_init_disabled:
         qgis_parent.setWindowTitle("Test QGIS dialog opened by Pytest-qgis")
         qgis_parent.show()
+
+        # Process events each time layer a visible layer is added to
+        # be able to change the extent properly
+        assert _APP
+        QgsProject.instance().legendLayersAdded.connect(_APP.processEvents)
     elif common_settings.qgis_init_disabled:
         warnings.warn(
             "Cannot show QGIS map because QGIS is not initialized. "

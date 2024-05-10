@@ -4,11 +4,11 @@
 
 * Add `clean_qgis_layer` decorator back alongside with automatic cleaning [#45](https://github.com/GispoCoding/pytest-qgis/pull/45)
 
-
 ## Fixes
 
 * [#55](https://github.com/GispoCoding/pytest-qgis/pull/55) Allows using MagicMocks to mock layers without problems
 * [#60](https://github.com/GispoCoding/pytest-qgis/pull/60) Allows using CRS properly again
+* [#62](https://github.com/GispoCoding/pytest-qgis/pull/62) Allow changing the map extent properly when showing the map
 
 # Version 2.0.0 (29-11-2023)
 
