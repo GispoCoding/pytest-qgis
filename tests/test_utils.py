@@ -18,12 +18,14 @@
 
 import pytest
 from pytest_qgis.utils import (
+    clean_qgis_layer,
     get_common_extent_from_all_layers,
     get_layers_with_different_crs,
     replace_layers_with_reprojected_clones,
     set_map_crs_based_on_layers,
 )
-from qgis.core import QgsCoordinateReferenceSystem, QgsProject
+from qgis.core import QgsCoordinateReferenceSystem, QgsProject, QgsVectorLayer
+from qgis.PyQt import sip
 
 from tests.utils import EPSG_3067, EPSG_4326, QGIS_VERSION
 
@@ -98,3 +100,16 @@ def test_replace_layers_with_reprojected_clones(  # noqa: PLR0913
     assert layers[raster_layer_name].crs().authid() == EPSG_4326
     assert (tmp_path / f"{vector_layer_id}.qml").exists()
     assert (tmp_path / f"{raster_layer_id}.qml").exists()
+
+
+def test_clean_qgis_layer(layer_polygon):
+    layer = QgsVectorLayer(layer_polygon.source(), "another layer")
+
+    @clean_qgis_layer
+    def layer_function() -> QgsVectorLayer:
+        return layer
+
+    # Using list to trigger yield and the code that runs after it
+    list(layer_function())
+
+    assert sip.isdeleted(layer)

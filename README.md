@@ -58,6 +58,35 @@ markers can be used.
 
 * `pytest_runtest_teardown` hook is used to ensure that all layer fixtures of any scope are cleaned properly without causing segmentation faults. The layer fixtures that are cleaned automatically must have some of the following keywords in their name: "layer", "lyr", "raster", "rast", "tif".
 
+
+### Utility tools
+
+* `clean_qgis_layer` decorator found in `pytest_qgis.utils` can be used with `QgsMapLayer` fixtures to ensure that they
+  are cleaned properly if they are used but not added to the `QgsProject`. This is only needed with layers with other than memory provider.
+
+  This decorator works only with fixtures that **return** QgsMapLayer instances.
+  There is no support for fixtures that use yield.
+
+  This decorator is an alternative way of cleaning the layers, since `pytest_runtest_teardown` hook cleans layer fixtures automatically by the keyword.
+
+  ```python
+  # conftest.py or start of a test file
+  import pytest
+  from pytest_qgis.utils import clean_qgis_layer
+  from qgis.core import QgsVectorLayer
+
+  @pytest.fixture()
+  @clean_qgis_layer
+  def geojson() -> QgsVectorLayer:
+      return QgsVectorLayer("layer_file.geojson", "some layer")
+
+  # This will be cleaned automatically since it contains the keyword "layer" in its name
+  @pytest.fixture()
+  def geojson_layer() -> QgsVectorLayer:
+      return QgsVectorLayer("layer_file2.geojson", "some layer")
+  ```
+
+
 ### Command line options
 
 * `--qgis_disable_gui` can be used to disable graphical user interface in tests. This speeds up the tests that use Qt

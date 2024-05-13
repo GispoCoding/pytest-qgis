@@ -1,5 +1,10 @@
 # Unreleased
 
+## New Features
+
+* Add `clean_qgis_layer` decorator back alongside with automatic cleaning [#45](https://github.com/GispoCoding/pytest-qgis/pull/45)
+
+
 ## Fixes
 
 * [#55](https://github.com/GispoCoding/pytest-qgis/pull/55) Allows using MagicMocks to mock layers without problems

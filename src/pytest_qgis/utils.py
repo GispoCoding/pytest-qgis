@@ -18,8 +18,9 @@
 #
 import time
 from collections import Counter
+from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Callable, Generator, Optional
 from unittest.mock import MagicMock
 
 from osgeo import gdal
@@ -180,6 +181,36 @@ def copy_layer_style_and_position(
     ]
 
     group.insertLayer(index + 1, layer2)
+
+
+def clean_qgis_layer(fn: Callable[..., QgsMapLayer]) -> Callable[..., QgsMapLayer]:
+    """
+    Decorator to ensure that a map layer created by a fixture is cleaned properly.
+
+    Sometimes fixture non-memory layers that are used but not added
+    to the project might cause segmentation fault errors.
+
+    This decorator works only with fixtures that **return** QgsMapLayer instances.
+    There is no support for fixtures that use yield.
+
+    >>> @pytest.fixture()
+    >>> @clean_qgis_layer
+    >>> def geojson_layer() -> QgsVectorLayer:
+    >>>     layer = QgsVectorLayer("layer.json", "layer", "ogr")
+    >>>     return layer
+
+    This decorator is the alternative way of cleaning the layers since layer fixtures
+    are automatically cleaned if they contain one of the keywords listed in
+    LAYER_KEYWORDS by pytest_runtest_teardown hook.
+    """
+
+    @wraps(fn)
+    def wrapper(*args: Any, **kwargs: Any) -> Generator[QgsMapLayer, None, None]:
+        layer = fn(*args, **kwargs)
+        yield layer
+        _set_layer_owner_to_project(layer)
+
+    return wrapper
 
 
 def ensure_qgis_layer_fixtures_are_cleaned(request: "FixtureRequest") -> None:
