@@ -158,6 +158,7 @@ def qgis_app(request: "SubRequest") -> QgsApplication:
 
     if not request.config._plugin_settings.qgis_init_disabled:
         assert _APP
+        QgsProject.instance().legendLayersAdded.disconnect(_APP.processEvents)
         if not sip.isdeleted(_CANVAS) and _CANVAS is not None:
             _CANVAS.deleteLater()
         _APP.exitQgis()
@@ -303,6 +304,16 @@ def _start_and_configure_qgis_app(config: "Config") -> None:
 
         mock.patch("qgis.utils.iface", _IFACE).start()
 
+    if _APP is not None:
+        # QGIS zooms to the layer's extent if it
+        # is the first layer added to the map.
+        # If the qgis_show_map marker is used, this zooming might occur
+        # at some later time when events are processed (e.g. at qtbot.wait call)
+        # and this might change the extent unexpectedly.
+        # It is better to process events right after adding the
+        # layer to avoid these kind of problems.
+        QgsProject.instance().legendLayersAdded.connect(_APP.processEvents)
+
 
 def _initialize_processing(qgis_app: QgsApplication) -> None:
     python_plugins_path = os.path.join(qgis_app.pkgDataPath(), "python", "plugins")
@@ -317,11 +328,6 @@ def _show_qgis_dlg(common_settings: Settings, qgis_parent: QWidget) -> None:
     if not common_settings.qgis_init_disabled:
         qgis_parent.setWindowTitle("Test QGIS dialog opened by Pytest-qgis")
         qgis_parent.show()
-
-        # Process events each time layer a visible layer is added to
-        # be able to change the extent properly
-        assert _APP
-        QgsProject.instance().legendLayersAdded.connect(_APP.processEvents)
     elif common_settings.qgis_init_disabled:
         warnings.warn(
             "Cannot show QGIS map because QGIS is not initialized. "

@@ -6,9 +6,9 @@
 
 ## Fixes
 
-* [#55](https://github.com/GispoCoding/pytest-qgis/pull/55) Allows using MagicMocks to mock layers without problems
+* [#53](https://github.com/GispoCoding/pytest-qgis/pull/53) Allow using MagicMocks to mock layers without problems
 * [#60](https://github.com/GispoCoding/pytest-qgis/pull/60) Allows using CRS properly again
-* [#62](https://github.com/GispoCoding/pytest-qgis/pull/62) Allow changing the map extent properly when showing the map
+* [#62](https://github.com/GispoCoding/pytest-qgis/pull/62) Map does no longer zoom to the first added layer upon processing the events when using `qgis_show_map` marker
 
 # Version 2.0.0 (29-11-2023)
 

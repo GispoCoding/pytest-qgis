@@ -129,12 +129,16 @@ def test_show_map_crs_change_to_4326_2(layer_polygon, layer_points, layer_polygo
 
 
 @pytest.mark.qgis_show_map(timeout=DEFAULT_TIMEOUT, zoom_to_common_extent=False)
-def test_show_map_should_not_keep_the_set_extent(
+def test_map_extent_should_not_change_to_layers_extent_when_processing_events(
     layer_polygon_3067, qgis_canvas, qgis_app
 ):
+    extent_smaller_than_layer = QgsRectangle(475804, 7145949.5, 549226, 7219371.5)
+
     QgsProject.instance().addMapLayer(layer_polygon_3067)
-    qgis_canvas.setExtent(QgsRectangle(475804, 7145949.5, 549226, 7219371.5))
+    qgis_canvas.setExtent(extent_smaller_than_layer)
+
     # This triggers the map to set the extent based on the layer
     # if events are not processed after adding the layer
     qgis_app.processEvents()
-    assert qgis_canvas.extent().area() < 1e11  # noqa: PLR2004
+
+    assert qgis_canvas.extent().height() == extent_smaller_than_layer.height()
