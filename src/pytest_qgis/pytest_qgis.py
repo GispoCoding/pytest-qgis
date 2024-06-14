@@ -158,6 +158,7 @@ def qgis_app(request: "SubRequest") -> QgsApplication:
 
     if not request.config._plugin_settings.qgis_init_disabled:
         assert _APP
+        QgsProject.instance().legendLayersAdded.disconnect(_APP.processEvents)
         if not sip.isdeleted(_CANVAS) and _CANVAS is not None:
             _CANVAS.deleteLater()
         _APP.exitQgis()
@@ -302,6 +303,16 @@ def _start_and_configure_qgis_app(config: "Config") -> None:
         from qgis.utils import iface  # noqa: F401 # This import is required
 
         mock.patch("qgis.utils.iface", _IFACE).start()
+
+    if _APP is not None:
+        # QGIS zooms to the layer's extent if it
+        # is the first layer added to the map.
+        # If the qgis_show_map marker is used, this zooming might occur
+        # at some later time when events are processed (e.g. at qtbot.wait call)
+        # and this might change the extent unexpectedly.
+        # It is better to process events right after adding the
+        # layer to avoid these kind of problems.
+        QgsProject.instance().legendLayersAdded.connect(_APP.processEvents)
 
 
 def _initialize_processing(qgis_app: QgsApplication) -> None:
