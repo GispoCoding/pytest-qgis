@@ -1,8 +1,10 @@
 # Unreleased
 
+# Version 2.1.0 (14-06-2024)
+
 ## New Features
 
-* Add `clean_qgis_layer` decorator back alongside with automatic cleaning [#45](https://github.com/GispoCoding/pytest-qgis/pull/45)
+* Add `clean_qgis_layer` decorator back alongside with automatic cleaning [#64](https://github.com/GispoCoding/pytest-qgis/pull/64)
 
 ## Fixes
 
